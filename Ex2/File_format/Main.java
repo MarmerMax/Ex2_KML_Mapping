@@ -7,9 +7,9 @@ public class Main {
 	public static void main(String[] args) {
 		
 		
-		Csv2kml file = new Csv2kml(new File("E:\\OOP\\Ex2\\Ex2\\Files\\WigleWifi_2020.csv"));	
+		//Csv2kml file = new Csv2kml(new File("Files\\WigleWifi_20171203085618.csv"));	
 
-		MultiCSV file2 = new MultiCSV(new File("E:\\OOP\\Ex2\\Ex2\\Files"));
+		MultiCSV file2 = new MultiCSV(new File("E:\\OOP\\Ex3\\Ex2_KML_Mapping\\Ex2\\Files"));
 
 	}
 

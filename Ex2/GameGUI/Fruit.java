@@ -3,6 +3,7 @@ package GameGUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -60,7 +61,13 @@ public class Fruit {
 	public BufferedImage getFruitImage() {
 		BufferedImage fruitImage = null;
 		try {
-			fruitImage = ImageIO.read(new File("data\\fruit.png"));
+			double r = Math.random();
+			if(r < 0.5) {
+				fruitImage = ImageIO.read(new File("data\\fruit.png"));
+			}
+			else {
+				fruitImage = ImageIO.read(new File("data\\fruit2.png"));
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -46,7 +46,7 @@ public class MyFrame extends JFrame implements MouseListener{
 		catch (IOException e) {
 
 		}
-		this.addMouseListener(this); 
+		//this.addMouseListener(this);
 	}
 
 	private void createGUI() throws IOException {
@@ -79,18 +79,20 @@ public class MyFrame extends JFrame implements MouseListener{
 		menuBar.add(game);
 
 		this.setMenuBar(menuBar);
+
+
 		background = new Map().getMap();
 		/////////////////   file menu   //////////////////////
-
 		fileItemOpen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String fileName = readFileDialog();
-				Game temp = new Game();
-				temp.readFileDialog(fileName);
-				pacmanList = temp.getPacmanList();
-				fruitList = temp.getFruitList();
+				Game game = new Game();
+				game.readFileDialog(fileName);
+				pacmanList = game.getPacmanList();
+				fruitList = game.getFruitList();
 				repaint();
+				//ShortestPathAlgo path = new ShortestPathAlgo(game);
 			}
 		});
 
@@ -118,124 +120,75 @@ public class MyFrame extends JFrame implements MouseListener{
 			}
 		});
 
-		//		gameItemClear.addActionListener(new ActionListener() {
-		//			@Override
-		//			public void actionPerformed(ActionEvent e) {
-		//				speed = 1;
-		//				figure = 'P';
-		//				x = y = 0;
-		//			}
-		//		});
-
 		fileItemExit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				System.exit(0);
 			}
 		});
-
-
-
-
-
 	}
 	//35.20222222	35.21222222 
 	//32.10555556	32.10194444
-	private int Lat2X(Double lat) {
-		double px2deg = 143300;
-		double tempLat = 35.21222222 - lat;
-		return (int)(px2deg * tempLat);
-	}
-
-	private int Lon2Y(Double lon) {
-		double px2deg = 172241.914;
-		double tempLon = 32.10194444 - lon;
-		return (int)(px2deg * tempLon);
-	}
 	
 	public int[] getXYfromLatLon(double latitude, double longitude) {
-		// get x value
-		int mapWidth = 1433, mapHeight = 622;
-		int pX = (int)((longitude+180.)*(mapWidth/360.));
-
-		// convert from degrees to radians
-		double latRad = latitude*Math.PI/180.;
-
-		// get y value
-		double mercN = Math.log(Math.tan((Math.PI/4.)+(latRad/2.)));
-		int pY = (int)((mapHeight/2.)-(mapWidth*mercN/(2.*Math.PI)));
-		System.out.println("x = "+pX+", y = "+pY);
-		int [] c = new int[2];
-		c[0] = pX;
-		c[1] = pY;
-		return c;
+		double mapHeight = 622;
+		double mapWidth = 1433;
+		double mapLatBottom = 32.10194444;
+		double mapLngLeft = 35.20222222;
+		double mapLngRight = 	35.21222222;
+		double mapLatBottomRad = mapLatBottom * Math.PI / 180;
+		double latitudeRad = latitude * Math.PI / 180;
+		double mapLngDelta = (mapLngRight - mapLngLeft);
+		double worldMapWidth = ((mapWidth / mapLngDelta) * 360) / (2 * Math.PI);
+		double mapOffsetY = (worldMapWidth / 2 * Math.log((1 + Math.sin(mapLatBottomRad))
+							 / (1 - Math.sin(mapLatBottomRad))));
+		double x = (longitude - mapLngLeft) * (mapWidth / mapLngDelta);
+		double y = mapHeight - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) 
+								/ (1 - Math.sin(latitudeRad)))) - mapOffsetY);
+		int [] cc = new int[2];
+		cc[0] = (int)x;
+		cc[1] = (int)y;
+		return cc;
 	}
 
 	public void paint(Graphics g){
 		g.drawImage(background, 0, 0, this);
 		if(pacmanList != null) {
-			Iterator<Pacman> it1 = pacmanList.iterator();
-			int index = 0;
-			while(it1.hasNext()) {
-				Pacman temp = it1.next();
-				int imageSize = 50;
-				int [] c = new int[2]; 
-				c =	getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
-//				int pxX = Lat2X(temp.getCoordinates().y());
-//				int pxY = Lon2Y(temp.getCoordinates().x());
-				g.drawImage(temp.getPacmanImage(), c[0] - (imageSize / 2), c[1] - (imageSize / 2), imageSize, imageSize, this);
-				index++;
-			}
+			drawPacman(g);
+			//repaint();
 		}
 		if(fruitList != null) {
-//			Iterator<Fruit> it2 = fruitList.iterator();
-//			while(it2.hasNext()) {
-//				Fruit temp = it2.next();
-//				int imageSize = 30;
-//				int [] c = new int[2]; 
-//				c = getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
-//				int pxX = c[0];
-//				int pxY = c[1];
-//				g.drawImage(temp.getFruitImage(), pxX - (imageSize / 2), pxY - (imageSize / 2), imageSize, imageSize, this);
-//			}
-//			int a = 0;
-//			while(a < 3) {
-//				x = 50;
-//				y = 100;
-//				g.drawImage(fruitList.get(0).getFruitImage(),x - (30 / 2), y - (30 / 2), 30, 30, this);
-//				g.drawImage(fruitList.get(0).getFruitImage(),x - (30 / 2), y - (30 / 2), 30, 30, this);
-//				x += 100;
-//				a++;
-//			}
-			//System.out.println(a);
-			x = 50;
-			y = 100;
-			g.drawImage(fruitList.get(0).getFruitImage(),x - (30 / 2), y - (30 / 2), 30, 30, this);
-			g.drawImage(fruitList.get(0).getFruitImage(),x - (30 / 2) + 50, y - (30 / 2), 30, 30, this);
-			g.drawImage(fruitList.get(0).getFruitImage(),x - (30 / 2) + 100, y - (30 / 2), 30, 30, this);
+			drawFruit(g);
+			//repaint();
 		}
-
-		//		if(x!=-1 && y!=-1){
-		//			BufferedImage image = null;
-		//			int imageSize;
-		//			
-		//			switch (figure) {
-		//			case 'P':
-		//				image = new Pacman(x, y).getPacman();
-		//				imageSize = 50;
-		//				break;
-		//			case 'F': 
-		//				image = new Fruit(x, y).getFruit();
-		//				imageSize = 30;
-		//				break;
-		//			default:
-		//				imageSize = 20;
-		//				break;
-		//			}
-		//			
-		//			g.drawImage(image, x - (imageSize / 2), y - (imageSize / 2), imageSize, imageSize, this);
-		//		}
 	}
+
+	public void drawPacman(Graphics g) {
+		int index = 0;
+		while(index < pacmanList.size()) {
+			Pacman temp = pacmanList.get(index);
+			int [] coor = getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
+			g.drawImage(pacmanList.get(index).getPacmanImage(), coor[0] - 20, coor[1] - 20, 40, 40, this);
+			index++;
+		}
+	}
+
+	public void drawFruit(Graphics g) {
+		int index = 0;
+		while(index < fruitList.size()) {
+			Fruit temp = fruitList.get(index);
+			int [] coor = getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
+			g.drawImage(fruitList.get(index).getFruitImage(), coor[0] - 15, coor[1] - 15, 30, 30, this);
+			index++;
+		}
+	}
+	
+	public void drawPath() {
+		
+	}
+
+
+
 	public String readFileDialog() {
 		//try read from the file
 		FileDialog fd = new FileDialog(this, "Open text file", FileDialog.LOAD);
@@ -250,7 +203,6 @@ public class MyFrame extends JFrame implements MouseListener{
 		fd.setVisible(true);
 		String folder = fd.getDirectory();
 		String fileName = fd.getFile();
-
 		return folder + fileName;
 	}		
 
@@ -262,6 +214,7 @@ public class MyFrame extends JFrame implements MouseListener{
 		y = arg.getY();
 		repaint();
 	}
+
 	@Override
 	public void mouseEntered(MouseEvent arg0) {}
 	@Override
