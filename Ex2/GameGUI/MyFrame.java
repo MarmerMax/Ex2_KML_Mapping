@@ -91,6 +91,7 @@ public class MyFrame extends JFrame implements MouseListener{
 				game.readFileDialog(fileName);
 				pacmanList = game.getPacmanList();
 				fruitList = game.getFruitList();
+				game.createPath();
 				repaint();
 				//ShortestPathAlgo path = new ShortestPathAlgo(game);
 			}

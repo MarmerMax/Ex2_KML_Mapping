@@ -17,6 +17,7 @@ public class Game {
 	
 	private LinkedList<Pacman> pacmanList;
 	private LinkedList<Fruit> fruitList;
+	private ShortestPathAlgo path;
 	
 	public Game() {
 		pacmanList = new LinkedList<>();
@@ -29,6 +30,10 @@ public class Game {
 
 	public LinkedList<Fruit> getFruitList() {
 		return fruitList;
+	}
+	
+	public void createPath() {
+		path = new ShortestPathAlgo(this);
 	}
 
 	public void readFileDialog(String fileName) {
