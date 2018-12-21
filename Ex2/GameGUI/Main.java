@@ -8,9 +8,9 @@ public class Main {
 		//new Game().play();
 		
 		MyFrame window = new MyFrame();
-		window.setVisible(true);
-		window.setSize(window.background.getWidth(),window.background.getHeight());
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		window.setVisible(true);
+//		window.setSize(window.background.getWidth(),window.background.getHeight());
+//		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
 

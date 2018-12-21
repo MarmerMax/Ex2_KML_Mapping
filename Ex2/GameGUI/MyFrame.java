@@ -1,5 +1,6 @@
 package GameGUI;
 
+import java.awt.Component;
 import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.Menu;
@@ -7,8 +8,13 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,6 +39,9 @@ public class MyFrame extends JFrame implements MouseListener{
 	public BufferedImage background;
 	private LinkedList<Pacman> pacmanList = null;
 	private LinkedList<Fruit> fruitList = null;
+	private LinkedList<Path> pathList;
+	private int height, width, startHeight, startWidth;
+	private double heightPercent, widthPercent;
 	private int x, y;
 
 	private char figure = 'P';
@@ -51,6 +60,19 @@ public class MyFrame extends JFrame implements MouseListener{
 
 	private void createGUI() throws IOException {
 
+		background = new Map().getMap();
+		heightPercent = widthPercent = 1;
+		startHeight = background.getHeight();
+		startWidth = background.getWidth();
+		height = startHeight;
+		width = startWidth;
+
+
+		setVisible(true);
+		setSize(background.getWidth(),background.getHeight());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
 		MenuBar menuBar = new MenuBar();
 		//file menu 
 		Menu file = new Menu("File");
@@ -65,23 +87,32 @@ public class MyFrame extends JFrame implements MouseListener{
 		menuBar.add(file);
 
 		//game menu
+		Menu create = new Menu("Create");
+		//MenuItem gameItemStart = new MenuItem("Start");
+		MenuItem createItemPacman = new MenuItem("Add Pacman");
+		MenuItem createItemFruit = new MenuItem("Add Fruit");
+		MenuItem createItemSetSpeed = new MenuItem("Set speed");
+		create.add(createItemPacman);
+		create.add(createItemFruit);
+		create.add(createItemSetSpeed);
+
+		menuBar.add(create);
+
+		//start menu
 		Menu game = new Menu("Game");
 		MenuItem gameItemStart = new MenuItem("Start");
-		MenuItem gameItemPacman = new MenuItem("Add Pacman");
-		MenuItem gameItemFruit = new MenuItem("Add Fruit");
-		MenuItem gameItemSetSpeed = new MenuItem("Set speed");
+		MenuItem gameItemStop = new MenuItem("Stop");
 		MenuItem gameItemClear = new MenuItem("Clear");	
 		game.add(gameItemStart);
-		game.add(gameItemPacman);
-		game.add(gameItemFruit);
-		game.add(gameItemSetSpeed);
+		game.add(gameItemStop);
 		game.add(gameItemClear);
 		menuBar.add(game);
-
 		this.setMenuBar(menuBar);
 
 
-		background = new Map().getMap();
+
+
+
 		/////////////////   file menu   //////////////////////
 		fileItemOpen.addActionListener(new ActionListener() {
 			@Override
@@ -91,25 +122,34 @@ public class MyFrame extends JFrame implements MouseListener{
 				game.readFileDialog(fileName);
 				pacmanList = game.getPacmanList();
 				fruitList = game.getFruitList();
-				game.createPath();
+			//	ShortestPathAlgo pathes = new ShortestPathAlgo(game);
+			//	pathList = pathes.getPathList();
+				//game.createPath();
 				repaint();
 				//ShortestPathAlgo path = new ShortestPathAlgo(game);
 			}
 		});
 
-		////////////////   game menu   //////////////////////
-		gameItemPacman.addActionListener(new ActionListener() {
+		fileItemExit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				System.exit(0);
+			}
+		});
+
+		////////////////   create menu   //////////////////////
+		createItemPacman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				figure = 'P';
 			}
 		});
-		gameItemFruit.addActionListener(new ActionListener() {
+		createItemFruit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				figure = 'F';
 			}
 		});
 
-		gameItemSetSpeed.addActionListener(new ActionListener(){
+		createItemSetSpeed.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String speedInput = JOptionPane.showInputDialog(null, "Choose speed");
@@ -121,16 +161,44 @@ public class MyFrame extends JFrame implements MouseListener{
 			}
 		});
 
-		fileItemExit.addActionListener(new ActionListener() {
+		/////////////////////start menu//////////////////////////////
+		gameItemStart.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent evt) {
-				System.exit(0);
+			public void actionPerformed(ActionEvent e) {
+
 			}
 		});
+
+		gameItemClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pathList = new LinkedList<>();
+				fruitList = new LinkedList<>();
+				pacmanList = new LinkedList<>();
+				repaint();
+			}
+		});
+
+		getContentPane().addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				Component c = (Component)e.getComponent();
+				width = c.getWidth();
+				height = c.getHeight();
+				windowResize();
+				repaint();
+			}
+		});	
 	}
+
+
+	public void windowResize() {
+		widthPercent = width / startWidth;
+		heightPercent = height / startHeight;
+	}
+
 	//35.20222222	35.21222222 
 	//32.10555556	32.10194444
-	
+
 	public int[] getXYfromLatLon(double latitude, double longitude) {
 		double mapHeight = 622;
 		double mapWidth = 1433;
@@ -142,10 +210,10 @@ public class MyFrame extends JFrame implements MouseListener{
 		double mapLngDelta = (mapLngRight - mapLngLeft);
 		double worldMapWidth = ((mapWidth / mapLngDelta) * 360) / (2 * Math.PI);
 		double mapOffsetY = (worldMapWidth / 2 * Math.log((1 + Math.sin(mapLatBottomRad))
-							 / (1 - Math.sin(mapLatBottomRad))));
+				/ (1 - Math.sin(mapLatBottomRad))));
 		double x = (longitude - mapLngLeft) * (mapWidth / mapLngDelta);
 		double y = mapHeight - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) 
-								/ (1 - Math.sin(latitudeRad)))) - mapOffsetY);
+				/ (1 - Math.sin(latitudeRad)))) - mapOffsetY);
 		int [] cc = new int[2];
 		cc[0] = (int)x;
 		cc[1] = (int)y;
@@ -153,7 +221,7 @@ public class MyFrame extends JFrame implements MouseListener{
 	}
 
 	public void paint(Graphics g){
-		g.drawImage(background, 0, 0, this);
+		g.drawImage(background, 0, 0, width, height,this);
 		if(pacmanList != null) {
 			drawPacman(g);
 			//repaint();
@@ -162,6 +230,9 @@ public class MyFrame extends JFrame implements MouseListener{
 			drawFruit(g);
 			//repaint();
 		}
+//		if(pathList != null) {
+//			drawPath(g);  
+//		}
 	}
 
 	public void drawPacman(Graphics g) {
@@ -170,6 +241,9 @@ public class MyFrame extends JFrame implements MouseListener{
 			Pacman temp = pacmanList.get(index);
 			int [] coor = getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
 			g.drawImage(pacmanList.get(index).getPacmanImage(), coor[0] - 20, coor[1] - 20, 40, 40, this);
+//			int xP = (int)((double)coor[0] * widthPercent);
+//			int yP = (int)((double)coor[1] * heightPercent);
+//			g.drawImage(pacmanList.get(index).getPacmanImage(), xP - 20, yP - 20, 40, 40, this);
 			index++;
 		}
 	}
@@ -180,14 +254,27 @@ public class MyFrame extends JFrame implements MouseListener{
 			Fruit temp = fruitList.get(index);
 			int [] coor = getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
 			g.drawImage(fruitList.get(index).getFruitImage(), coor[0] - 15, coor[1] - 15, 30, 30, this);
+//			int xP = (int)((double)coor[0] * widthPercent);
+//			int yP = (int)((double)coor[1] * heightPercent);
+//			g.drawImage(fruitList.get(index).getFruitImage(), xP - 15, yP - 15, 30, 30, this);
 			index++;
 		}
 	}
-	
-	public void drawPath() {
-		
-	}
 
+	public void drawPath(Graphics g) {
+		int index = 0;
+		while(index < pathList.size()) {
+			Path temp = pathList.get(index);
+			double x1 = temp.getPointList().get(index).x();
+			double y1 = temp.getPointList().get(index).y();
+			double x2 = temp.getPointList().get(index + 1).x();
+			double y2 = temp.getPointList().get(index + 1).y();
+			int [] coor1 = getXYfromLatLon(x1, y1);
+			int [] coor2 = getXYfromLatLon(x2, y2);
+			g.drawLine(coor1[0], coor1[1], coor2[0], coor2[1]);
+			index++;
+		}
+	}
 
 
 	public String readFileDialog() {
