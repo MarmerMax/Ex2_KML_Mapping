@@ -13,21 +13,22 @@ public class Fruit {
 
 	private final char type = 'F';
 	private int id;
-	private Point3D coor;
+	private Point3D point;
 	private double speed;
+	private BufferedImage fruitImage;
+	
+	private int idCount = 0;
+	
 
 	//private BufferedImage fruitImage;
 
-	//	public Fruit(int x, int y) {
-	//		coor = new int[2];
-	//		coor[0] = x;
-	//		coor[1] = y;
-	//		try {
-	//			fruit = ImageIO.read(new File("data\\fruit.png"));
-	//		} catch (IOException e) {
-	//			e.printStackTrace();
-	//		}
-	//	}
+		public Fruit(int x, int y) {
+			this.id = idCount++;
+			double [] xyCoordinate = fromPixelToLatLon(x, y);
+			this.point = new Point3D(xyCoordinate[0], xyCoordinate[1], 0);
+			this.speed = 1;
+			createImage();
+		}
 
 	public Fruit(String [] values) {
 		try {
@@ -35,7 +36,8 @@ public class Fruit {
 			double x = Double.parseDouble(values[2]);
 			double y = Double.parseDouble(values[3]);
 			double z = Double.parseDouble(values[4]);
-			coor = new Point3D(x, y, z);
+			createImage();
+			point = new Point3D(x, y, z);
 			speed = Double.parseDouble(values[5]);
 		}catch(Exception e) {
 			System.err.println("Fruit create failed. Incorect data!");
@@ -47,7 +49,7 @@ public class Fruit {
 	}
 
 	public Point3D getCoordinates() {
-		return coor;
+		return point;
 	}
 
 	public double getSpeed() {
@@ -57,21 +59,31 @@ public class Fruit {
 	public char getType() {
 		return type;
 	}
-
-	public BufferedImage getFruitImage() {
-		BufferedImage fruitImage = null;
+	
+	public void createImage() {
+		fruitImage = null;
 		try {
-			double r = Math.random();
-			if(r < 0.5) {
-				fruitImage = ImageIO.read(new File("data\\fruit.png"));
-			}
-			else {
-				fruitImage = ImageIO.read(new File("data\\fruit2.png"));
-			}
+			fruitImage = ImageIO.read(new File("data\\fruit.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public BufferedImage getFruitImage() {
 		return fruitImage;
+	}
+	
+	public void removeFruitImage() {
+		fruitImage = null;
+	}
+	
+	public double[] fromPixelToLatLon(int x, int y) {
+		double [] xy = new double[2];
+		double xStep = (35.21222222 - 35.20222222) / 1433; 
+		double yStep = (32.10555556 - 32.10194444) / 642;
+		xy[0] = 32.10555556 - (yStep * y);
+		xy[1] = 35.20222222 + (xStep * x);
+		return xy;
 	}
 
 }

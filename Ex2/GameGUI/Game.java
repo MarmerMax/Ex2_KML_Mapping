@@ -4,8 +4,10 @@ import java.awt.FileDialog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
@@ -62,6 +64,62 @@ public class Game {
             System.out.print("Error reading file " + ex);
             System.exit(2);
         }
+    }
+	
+    public void writeFileDialog(String fileName) {
+        try {
+            FileWriter fw = new FileWriter(fileName);
+            PrintWriter outs = new PrintWriter(fw);
+            StringBuilder sb = new StringBuilder();
+            String [] columnName = {"Type", "Id", "Lat", "Lon", "Alt", "Speed/Weight",
+            						"Radius", "" + pacmanList.size(), "" + fruitList.size()};
+            for(int i = 0; i < columnName.length; i++) {
+            	sb.append(columnName[i]);
+            	if(i + 1 < columnName.length) {
+            		sb.append(',');
+            	}
+            	else if(i + 1 == columnName.length) {
+            		sb.append('\n');
+            	}
+            }
+            for(int i = 0; i < pacmanList.size(); i++) {
+            	sb.append(pacmanList.get(i).getType());
+            	sb.append(',');
+            	sb.append(pacmanList.get(i).getId());
+            	sb.append(',');
+            	sb.append(pacmanList.get(i).getCoordinates().x());
+            	sb.append(',');
+            	sb.append(pacmanList.get(i).getCoordinates().y());
+            	sb.append(',');
+            	sb.append(pacmanList.get(i).getCoordinates().z());
+            	sb.append(',');
+            	sb.append(pacmanList.get(i).getSpeed());
+            	sb.append(',');
+            	sb.append(pacmanList.get(i).getRadius());
+            	sb.append('\n');
+            }
+            
+            for(int i = 0; i < fruitList.size(); i++) {
+            	sb.append(fruitList.get(i).getType());
+            	sb.append(',');
+            	sb.append(fruitList.get(i).getId());
+            	sb.append(',');
+            	sb.append(fruitList.get(i).getCoordinates().x());
+            	sb.append(',');
+            	sb.append(fruitList.get(i).getCoordinates().y());
+            	sb.append(',');
+            	sb.append(fruitList.get(i).getCoordinates().z());
+            	sb.append(',');
+            	sb.append(fruitList.get(i).getSpeed());
+            	sb.append('\n');
+            }
+            outs.write(sb.toString());
+            outs.close();
+            fw.close();
+        } catch (IOException ex) {
+            System.out.print("Error writing file  " + ex);
+        }
+        System.out.println("Save file done!");
     }
 	    
 }

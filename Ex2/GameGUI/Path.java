@@ -11,13 +11,13 @@ public class Path {
 	private LinkedList<Integer> idList;
 	private int pathSize;
 	private double pathLength;
-	private double speed;
+	//private double speed;
 
 
 	public Path(Pacman pacman, LinkedList<Fruit> fruitList, int pathSize, boolean [] usedFruits) {
 		this.pointList = new LinkedList<>();
 		this.idList = new LinkedList<>();
-		this.speed = pacman.getSpeed();
+	//	this.speed = pacman.getSpeed();
 		this.pathSize = pathSize;
 		this.pathLength = 0;
 		pointList.add(pacman.getCoordinates());

@@ -16,29 +16,26 @@ import Geom.Point3D;
 public class Pacman {
 
 
-	private char type = 'P';
+	private final char type = 'P';
 	private int id;
-	private Point3D coor;
+	private Point3D point;
 	private double speed;
 	private double radius;
-	private int nearFruitId;
+	private int idCount = 0;
+	//private int nearFruitId;
 
 	//private BufferedImage pacmanImage;
 
-	//	public Pacman(int x, int y) {
-	//		
-	//		//coor = new Point3D(p)
-	//		try {
-	//			pacman = ImageIO.read(new File("data\\pacman.png"));
-	//		} catch (IOException e) {
-	//		    Graphics g = null;
-	//		    g.setColor(Color.yellow);
-	//		    g.fillOval(x-25, y-25, 50, 50);
-	//		}
-	//	}
-	
+	public Pacman(int x, int y) {
+		this.id = idCount++;
+		double [] xyCoordinate = fromPixelToLatLon(x, y);
+		this.point = new Point3D(xyCoordinate[0], xyCoordinate[1], 0);
+		this.speed = 1;
+		this.radius = 1;
+	}
+
 	public Pacman() {
-		
+
 	}
 
 	public Pacman(String [] values) {
@@ -47,7 +44,7 @@ public class Pacman {
 			double x = Double.parseDouble(values[2]);
 			double y = Double.parseDouble(values[3]);
 			double z = Double.parseDouble(values[4]);
-			coor = new Point3D(x, y, z);
+			point = new Point3D(x, y, z);
 			speed = Double.parseDouble(values[5]);
 			radius = Double.parseDouble(values[6]);
 		}catch(Exception e) {
@@ -55,12 +52,25 @@ public class Pacman {
 		}	
 	}
 	
-	public void setNearFruitId(int id) {
-		this.nearFruitId = id;
+	public double[] fromPixelToLatLon(int x, int y) {
+		double [] xy = new double[2];
+		double xStep = (35.212479 - 35.202340) / 1433; 
+		double yStep = (32.105739 - 32.101852) / 642;
+		xy[0] = 32.105739 - (yStep * y);
+		xy[1] = 35.202340 + (xStep * x);
+		return xy;
 	}
+
+//	public void setNearFruitId(int id) {
+//		this.nearFruitId = id;
+//	}
+//
+//	public int getNearFruitId() {
+//		return nearFruitId;
+//	}
 	
-	public int getNearFruitId() {
-		return nearFruitId;
+	public void setSpeed(double sped) {
+		this.speed = speed;
 	}
 
 	public int getId() {
@@ -68,7 +78,7 @@ public class Pacman {
 	}
 
 	public Point3D getCoordinates() {
-		return coor;
+		return point;
 	}
 
 	public double getRadius() {
@@ -83,6 +93,8 @@ public class Pacman {
 		return type;
 	}
 
+
+
 	public BufferedImage getPacmanImage() {
 		BufferedImage pacmanImage = null;
 		try {
@@ -92,15 +104,4 @@ public class Pacman {
 		}
 		return pacmanImage;
 	}
-//	public JLabel getPacmanImage() {
-//		JLabel pacmanImage = null;
-//		try {
-//			//pacmanImage = ImageIO.read(new File("data\\pacman.png"));
-//			pacmanImage = new JLabel("data\\pacman.png");
-//		} catch (Exception e) {
-//			System.err.println("Pacman image create failed!!!");
-//		}
-//		return pacmanImage;
-//	}
-
 }

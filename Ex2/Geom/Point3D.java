@@ -36,6 +36,12 @@ public class Point3D implements Geom_element, Serializable
 	///////////////////////////////////////////////////////////////////////////
 
 	
+	public void addXYZ(double x, double y, double z) {
+		this._x += x;
+		this._y += y;
+		this._z += z;
+	}
+	
 	public double x() {return _x;}
 	public double y() {return _y;}
 	public double z() {return _z;}
@@ -56,8 +62,8 @@ public class Point3D implements Geom_element, Serializable
 	public double distance2D(Point3D p2) { 
 		return this.distance3D(p2.x(), p2.y(), this.z());
 	}
-	public double distance3D(Point3D p2) {
-		return this.distance3D(p2.x(), p2.y(), p2.z());}
+	public double distance3D(Point3D p2) {return this.distance3D(p2.x(), p2.y(), p2.z());}
+	
 	public double distance3D(double x, double y , double z)
 	{
 		double dx = _x-x;
