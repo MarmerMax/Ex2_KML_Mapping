@@ -49,7 +49,7 @@ public class MyFrame extends JFrame implements MouseListener{
 	private LinkedList<Pacman> pacmanList = null;
 	private LinkedList<Fruit> fruitList = null;
 	//private LinkedList<Path> pathList;
-	private LinkedList<LinkedList<Point3D>> pathList;
+	private LinkedList<Path> pathList;
 	private int height, width, startHeight, startWidth;
 	private double heightPercent, widthPercent;
 	private Game game = null;
@@ -92,10 +92,12 @@ public class MyFrame extends JFrame implements MouseListener{
 		MenuItem fileItemNewGame = new MenuItem("New game");
 		MenuItem fileItemOpen = new MenuItem("Open");
 		MenuItem fileItemSave = new MenuItem("Save");
+		MenuItem fileItemSaveToKml = new MenuItem("Path to KML");
 		MenuItem fileItemExit = new MenuItem("Exit");
 		file.add(fileItemNewGame);
 		file.add(fileItemOpen);
 		file.add(fileItemSave);
+		file.add(fileItemSaveToKml);
 		file.add(fileItemExit);
 		menuBar.add(file);
 
@@ -111,10 +113,8 @@ public class MyFrame extends JFrame implements MouseListener{
 		//start menu
 		Menu game1 = new Menu("Game");
 		MenuItem gameItemStart = new MenuItem("Start");
-		MenuItem gameItemStop = new MenuItem("Stop");
-		MenuItem gameItemClear = new MenuItem("Clear");	
+		MenuItem gameItemClear = new MenuItem("Clear");
 		game1.add(gameItemStart);
-		game1.add(gameItemStop);
 		game1.add(gameItemClear);
 		menuBar.add(game1);
 		this.setMenuBar(menuBar);
@@ -161,8 +161,21 @@ public class MyFrame extends JFrame implements MouseListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(game != null) {
-					String fileName = readFileDialog();
+					String fileName = writeFileDialog();
 					game.writeFileDialog(fileName);
+				}
+				else {
+					System.out.println("Can't save empty game!");
+				}
+			}
+		});
+		
+		fileItemSaveToKml.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(game != null) {
+					String fileName = writeFileKML();
+					game.writeFileKML(fileName, pathList);
 				}
 				else {
 					System.out.println("Can't save empty game!");
@@ -346,34 +359,29 @@ public class MyFrame extends JFrame implements MouseListener{
 	}
 
 	public void drawPath(Graphics g) {
-		int index = 0;
-		int indexPath = 0;
-		while(index < pathList.get(indexPath).size() - 1) {
-			//Path temp = pathList.get(index);
-			Point3D temp = pathList.get(indexPath).get(index);
-			Point3D temp2 = pathList.get(indexPath).get(index + 1);
-			//			double x1 = temp.getPointList().get(index).x();
-			//			double y1 = temp.getPointList().get(index).y();
-			//			double x2 = temp.getPointList().get(index + 1).x();
-			//			double y2 = temp.getPointList().get(index + 1).y();
-			double x1 = temp.x();
-			double y1 = temp.y();
-			double x2 = temp2.x();
-			double y2 = temp2.y();
-			int [] coor1 = getXYfromLatLon(x1, y1);
-			int [] coor2 = getXYfromLatLon(x2, y2);
+		//System.out.println(pathList.get(0).getIdList().size());
+		for(int i = 0; i < pathList.size(); i++) {
+			for(int j = 0; j < pathList.get(i).getPathSize() - 1; j++) {
+				Point3D temp = pathList.get(i).getPointList().get(j);
+				Point3D temp2 = pathList.get(i).getPointList().get(j + 1);
+				double x1 = temp.x();
+				double y1 = temp.y();
+				double x2 = temp2.x();
+				double y2 = temp2.y();
+				int [] coor1 = getXYfromLatLon(x1, y1);
+				int [] coor2 = getXYfromLatLon(x2, y2);
 
-			int xP1 = (int)((double)coor1[0] * widthPercent);
-			int yP1 = (int)((double)coor1[1] * heightPercent);
+				int xP1 = (int)((double)coor1[0] * widthPercent);
+				int yP1 = (int)((double)coor1[1] * heightPercent);
 
-			int xP2 = (int)((double)coor2[0] * widthPercent);
-			int yP2 = (int)((double)coor2[1] * heightPercent);
+				int xP2 = (int)((double)coor2[0] * widthPercent);
+				int yP2 = (int)((double)coor2[1] * heightPercent);
 
-			Graphics2D g2 = (Graphics2D) g;
-			g2.setStroke(new BasicStroke(3));
-			g2.setColor(Color.white);
-			g2.drawLine(xP1, 50 + yP1, xP2, 50 + yP2);
-			index++;
+				Graphics2D g2 = (Graphics2D) g;
+				g2.setStroke(new BasicStroke(3));
+				g2.setColor(Color.white);
+				g2.drawLine(xP1, 50 + yP1, xP2, 50 + yP2);
+			}
 		}
 	}
 
@@ -403,6 +411,22 @@ public class MyFrame extends JFrame implements MouseListener{
             @Override
             public boolean accept(File dir, String name) {
                 return name.endsWith(".csv");
+            }
+        });
+        fd.setVisible(true);
+        String folder = fd.getDirectory();
+        String fileName = fd.getFile();
+		return folder + fileName;
+    }
+    
+    public String writeFileKML() {
+        //try write to the file
+        FileDialog fd = new FileDialog(this, "Save the kml file", FileDialog.SAVE);
+        fd.setFile("*.kml");
+        fd.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".kml");
             }
         });
         fd.setVisible(true);

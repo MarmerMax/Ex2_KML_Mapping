@@ -1,5 +1,6 @@
 package GIS;
 
+import java.util.Date;
 import java.util.StringTokenizer;
 import Geom.GeomElement;
 import Geom.Geom_element;
@@ -55,11 +56,12 @@ public class GISElement implements GIS_element{
 			this.AltitudeMeters = values[8];
 			this.AccuracyMeters = values[9];
 			this.Type = values[10];
-			
+
 			//create geom element
 			element = (GeomElement) getGeom();
-			
-		} else {//if we have another amount of fields so line is incorrect
+
+		} 
+		else {//if we have another amount of fields so line is incorrect
 			isValid = false;
 		}
 
@@ -121,7 +123,7 @@ public class GISElement implements GIS_element{
 		double x = (N+alt) * Math.cos(lat) * Math.cos(lon);
 		double y = (N+alt) * Math.cos(lat) * Math.sin(lon);
 		double z = ((1-esq) * N + alt) * Math.sin(lat);
-		
+
 		return new Point3D(x, y, z);
 	}
 
