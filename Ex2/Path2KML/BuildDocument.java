@@ -14,6 +14,10 @@ import org.w3c.dom.Node;
  */
 public class BuildDocument {
 	
+	private String address;
+	private String addressPacman;
+	private String addressFruit;
+	
 	private Element document = null;
 	/**
 	 * Construction method. Create new KML type elements from CSV file and
@@ -21,11 +25,26 @@ public class BuildDocument {
 	 * @param doc name of general document
 	 * @param csvName name of CSV file that we need to translate
 	 */
-	public BuildDocument(Document doc) {
+	public BuildDocument(Document doc, String fileName) {
+		address = fileName;
+		createObjectsAddress();
 		//create <Document>
 		document = doc.createElement("Document");
 		//add all data to document
 		createDocument(doc);
+	}
+	
+	private void createObjectsAddress() {
+		int index = 0; 
+		int indexLastBackSlash = 0;
+		while(index < address.length()) {
+			if(address.charAt(index) == '\\') {
+				indexLastBackSlash = index;
+			}
+			index++;
+		}
+		addressPacman = address.substring(0, indexLastBackSlash + 1) + "pacmanIcon.png";
+		addressFruit = address.substring(0, indexLastBackSlash + 1) + "fruitIcon.png";
 	}
 	
 	/**
@@ -49,8 +68,8 @@ public class BuildDocument {
 		document.appendChild(getStyle(doc, "blue", "3", "ffff0000"));
 		document.appendChild(getStyle(doc, "Purple", "3", "ff800080"));
 
-		document.appendChild(getStyleOfObjects(doc, "pacman", "data\\pacman.png", "50", "50"));
-		document.appendChild(getStyleOfObjects(doc, "fruit", "data\\fruit.png", "30", "30"));
+		document.appendChild(getStyleOfObjects(doc, "pacman", addressPacman, "80", "80"));
+		document.appendChild(getStyleOfObjects(doc, "fruit", addressFruit, "80", "80"));
 		
 	}
 
@@ -64,16 +83,42 @@ public class BuildDocument {
 		return style;
 	}
 	
+//	private Node getStyleOfObjects(Document doc, String id, String path, String width, String height) {
+//	Element style = doc.createElement("Style");
+//	style.setAttribute("id", id);
+//	Element img = doc.createElement("img");
+//	img.setAttribute("src", path);
+//	img.setAttribute("width", width);
+//	img.setAttribute("height", height);
+//	style.appendChild(img);
+//
+//	return style;
+//}
+	
 	private Node getIcon(Document doc, String path, String width, String height) {
 		Element node = doc.createElement("Icon");
+		node.appendChild(getPathIcon(doc, path));
+		node.appendChild(getWidthIcon(doc, width));
+		node.appendChild(getHeightIcon(doc, height));
+				
+		return node;
+	}
+	
+	public Node getPathIcon(Document doc, String path) {
+		Element node = doc.createElement("href");
 		node.appendChild(doc.createTextNode(path));
-		Element w = doc.createElement("w");
-		w.appendChild(doc.createTextNode(width));
-		node.appendChild(w);
-		Element h = doc.createElement("h");
-		h.appendChild(doc.createTextNode(height));
-		node.appendChild(h);
-		
+		return node;
+	}
+	
+	public Node getWidthIcon(Document doc, String width) {
+		Element node = doc.createElement("w");
+		node.appendChild(doc.createTextNode(width));
+		return node;
+	}
+	
+	public Node getHeightIcon(Document doc, String height) {
+		Element node = doc.createElement("h");
+		node.appendChild(doc.createTextNode(height));
 		return node;
 	}
 	
@@ -88,8 +133,8 @@ public class BuildDocument {
 		Element style = doc.createElement("Style");
 		style.setAttribute("id", id);
 		Element lineStyle = doc.createElement("LineStyle");
-		lineStyle.appendChild(getColor(doc, color));
-		lineStyle.appendChild(getWidth(doc, width));
+		lineStyle.appendChild(getColorLine(doc, color));
+		lineStyle.appendChild(getWidthLine(doc, width));
 		
 		style.appendChild(lineStyle);
 
@@ -101,7 +146,7 @@ public class BuildDocument {
 	 * @param width
 	 * @return node of width
 	 */
-	private Node getWidth(Document doc, String width) {
+	private Node getWidthLine(Document doc, String width) {
 		Element node = doc.createElement("width");
 		node.appendChild(doc.createTextNode(width));
 		return node;
@@ -112,7 +157,7 @@ public class BuildDocument {
 	 * @param color
 	 * @return node of color
 	 */
-	private Node getColor(Document doc, String color) {
+	private Node getColorLine(Document doc, String color) {
 		Element node = doc.createElement("color");
 		node.appendChild(doc.createTextNode(color));
 		return node;

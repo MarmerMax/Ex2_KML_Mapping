@@ -6,6 +6,7 @@ import GIS.GISElement;
 import GIS.GISLayer;
 import GIS.GISProject;
 import GameGUI.Path;
+import Geom.Point3D;
 import sun.security.tools.PathList;
 
 import java.sql.Timestamp;
@@ -22,12 +23,12 @@ import org.w3c.dom.Node;
  *
  */
 public class BuildFolder {
-	
+
 	private Element folder = null;
 	private GISLayer layer = null;
 	private LinkedList<Path> pathList;
 	private String [] colors;
-	
+
 	/**
 	 * Construction method. Create folder and add all points.
 	 * @param doc name of general document that include this folder.
@@ -42,7 +43,7 @@ public class BuildFolder {
 		//Add this file to folder
 		addPath(doc);
 	}
-	
+
 	/**
 	 * This method return folder with all data that we read from CSV file.
 	 * @return folder of data
@@ -50,7 +51,7 @@ public class BuildFolder {
 	public Node getFolder() {
 		return folder;
 	}
-	
+
 	/**
 	 * This method create folder and add him to document.
 	 * @param doc name of general document
@@ -73,19 +74,62 @@ public class BuildFolder {
 	 */
 	private void addPath(Document doc) {
 		try {
- 			for(int i = 0; i < pathList.size(); i++) {
- 				for(int j = 0; j < pathList.get(i).getPointList().size(); j++) {
- 					
- 				}
- 				int color = i % 5;
+			for(int i = 0; i < pathList.size(); i++) {
+				for(int j = 0; j < pathList.get(i).getPointList().size(); j++) {
+					String timeStamp = pathList.get(i).getTimeStamp().get(j);
+					Point3D temp = pathList.get(i).getPointList().get(j);
+					if(j == 0) {
+						Node pacman = createObjects(doc, temp, timeStamp, "#pacman");
+						folder.appendChild(pacman);
+					}
+					else {
+						Node fruit = createObjects(doc, temp, timeStamp, "#fruit");
+						folder.appendChild(fruit);
+					}	
+				}
+				int color = i % 5;
 				Node node = createPath(doc, pathList.get(i), color); //create node from current element 
 				folder.appendChild(node); //add this element to folder
 			}
 		}catch(Exception exp) {
-			System.out.println("Error: Get layer problem!!!");
+			System.out.println("Error: Placemark created problems!!!");
 		}
 	}
 	
+	private Node createObjects(Document doc, Point3D temp, String time, String type) {
+		Element placemark = doc.createElement("Placemark");
+		
+		Element timeStamp = doc.createElement("TimeStamp");
+		timeStamp.appendChild(getTimeStamp(doc, time));
+		placemark.appendChild(timeStamp);
+
+		Element styleUrl = doc.createElement("styleUrl");
+		styleUrl.appendChild(doc.createTextNode(type));
+		placemark.appendChild(styleUrl);
+
+		Element point = doc.createElement("Point");
+		point.appendChild(getPointCoordinates(doc, temp));
+		placemark.appendChild(point);
+
+		return placemark;
+	}
+	
+	public Node getTimeStamp(Document doc, String time) {
+		Node node = doc.createElement("when");
+		node.appendChild(doc.createTextNode(time));
+		return node;
+	}
+	
+	public Node getPointCoordinates(Document doc, Point3D point) {
+		Node node = doc.createElement("coordinates");
+		String x = "" + point.y();
+		String y = "" + point.x();
+		String z = "" + point.z();
+		node.appendChild(doc.createTextNode(x + "," + y + "," + z));
+		return node;
+	}
+	
+
 	/**
 	 * This method get element from layer and need to turn him to node.
 	 * @param doc name of general document
@@ -94,18 +138,18 @@ public class BuildFolder {
 	 */
 	private Node createPath(Document doc, Path temp, int color) {
 		Element placemark = doc.createElement("Placemark");
-		
+
 		Element styleUrl = doc.createElement("styleUrl");
 		styleUrl.appendChild(doc.createTextNode(getColor(color)));
 		placemark.appendChild(styleUrl);
-		
+
 		Element LineString = doc.createElement("LineString");
 		LineString.appendChild(getCoordinates(doc, temp));
 		placemark.appendChild(LineString);
-
+		
 		return placemark;
 	}
-	
+
 	private Node getCoordinates(Document doc, Path temp) {
 		Element node = doc.createElement("coordinates");
 		for(int i = 0; i < temp.getPointList().size(); i++) {
@@ -117,17 +161,17 @@ public class BuildFolder {
 		return node;
 	}
 
-	
-	/**
-	 * This method translate from date to time stamp format.
-	 * @param date current date
-	 * @return this date in time stamp format
-	 */
-	private String getTimeStamp(String date) {
-		Timestamp ts = Timestamp.valueOf(date) ;
-		return "" + ts.getTime();
-	}
-	
+
+//	/**
+//	 * This method translate from date to time stamp format.
+//	 * @param date current date
+//	 * @return this date in time stamp format
+//	 */
+//	private String getTimeStamp(String date) {
+//		Timestamp ts = Timestamp.valueOf(date) ;
+//		return "" + ts.getTime();
+//	}
+
 	/**
 	 * This method choose color for points.
 	 * @param channel channel of points

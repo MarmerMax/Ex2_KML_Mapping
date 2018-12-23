@@ -126,17 +126,6 @@ public class Game {
 
 	public void writeFileKML(String fileName, LinkedList<Path> pathList) {
 		setPathList(pathList);
-//		System.out.println(fileName);
-//		int index = 0;
-//		int lastBackSlash = 0;
-//		while(index < fileName.length()) {
-//			if(fileName.charAt(index) == '\\') {
-//				lastBackSlash = index;
-//			}
-//			index++;
-//		}
-//		fileName = fileName.substring(0, lastBackSlash);
-//		System.out.println(fileName);
 		new Path2KML(fileName, pathList);
 	}
 }

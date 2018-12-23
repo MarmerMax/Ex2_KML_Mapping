@@ -78,7 +78,7 @@ public class Path2KML {
 			newDoc.appendChild(kml); //doc add root(kml)
 
 			//create new document and add him to our kml
-			BuildDocument buildDocument = new BuildDocument(newDoc);
+			BuildDocument buildDocument = new BuildDocument(newDoc, kmlName);
 			Element document = (Element) buildDocument.getDocument();
 			
 			BuildFolder buildFolder = new BuildFolder(newDoc, pathList, colors);
@@ -96,7 +96,7 @@ public class Path2KML {
 			Result result = new StreamResult(new File(kmlName));
 			aTransformer.transform(src, result);
 
-			System.out.println("\nKML DOM Created Successfully..");
+			System.out.println("\nKML path Created Successfully..");
 
 		} catch (Exception exp) {
 			System.err.println(exp.toString());

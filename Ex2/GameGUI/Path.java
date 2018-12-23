@@ -94,6 +94,9 @@
 
 package GameGUI;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 
 import Coords.MyCoords;
@@ -109,6 +112,7 @@ public class Path {
 	private double speed;
 	private double radiusPacman;
 	private double radiusFruit;
+	private LinkedList<String> timestampList;
 	private int[][] usedFruits;
 	//private double speed;
 
@@ -124,8 +128,25 @@ public class Path {
 		this.radiusPacman = pacman.getRadius();
 		this.radiusFruit = 1;
 		pointList.add(pacman.getCoordinates());
+		String time = this.createTimestamp();
+		timestampList = new LinkedList<>();
+		timestampList.add(time);
 		idList.add(pacman.getId());
 		buildPath(fruitList, nextFruit);
+	}
+	
+	private String createTimestamp() {
+//		Date date = new Date();
+//		long time = date.getTime();
+//		Timestamp ts = new Timestamp(time);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String date = sdf.format(new Date());
+		return date;
+	}
+	
+	public LinkedList<String> getTimeStamp() {
+		return timestampList;
 	}
 
 	public LinkedList<Point3D> getPointList(){
@@ -146,6 +167,7 @@ public class Path {
 
 	private void buildPath(LinkedList<Fruit> fruitList, int nextFruit) {
 		pointList.add(fruitList.get(nextFruit).getCoordinates());
+		timestampList.add(createTimestamp());
 		idList.add(fruitList.get(nextFruit).getId());
 		usedFruits[nextFruit][0] = 1;
 		
@@ -168,6 +190,7 @@ public class Path {
 			}
 			if(indexNext != -1) {
 				pointList.add(fruitList.get(indexNext).getCoordinates());
+				timestampList.add(createTimestamp());
 				idList.add(fruitList.get(indexNext).getId());
 				usedFruits[indexNext][0] = 1;
 				indexAtualy = indexNext;
@@ -175,135 +198,4 @@ public class Path {
 			}
 		}
 	}
-	
-
-
-	//	private void buildPath(LinkedList<Fruit> fruitList, boolean [] usedFruits) {
-	//		findNextFruitAfterPacman(fruitList, usedFruits);
-	//		findAllNextFruits(fruitList, usedFruits);
-	//	}
-
-	//	private void findNextFruitAfterPacman(LinkedList<Fruit> fruitList, boolean [] usedFruits) {
-	//		double minDist = Double.MAX_VALUE;
-	//		//int nextFruit = -1;
-	//		int index = -1;
-	//		for(int i = 0; i < fruitList.size(); i++) {//find first fruit near to pacman by geom coordinates
-	//			MyCoords dist = new MyCoords();
-	//			double tempDist = dist.distance3d(pointList.get(0), fruitList.get(i).getCoordinates());//find dist between pacman to fruit
-	//			if(minDist > tempDist) {
-	//				minDist = tempDist;
-	//				index = i;
-	//			}
-	//		}
-	//		//add distance between pacman to next fruit into path length
-	//		pathLength += minDist;
-	//
-	//		//add next fruit coordinates to path list
-	//		pointList.add(fruitList.get(index).getCoordinates());
-	//		idList.add(fruitList.get(index).getId());
-	//		//mark index of next fruit in array of indexes in order not to use more  
-	//		usedFruits[index] = true;
-	//	}
-
-	//	private void findAllNextFruits(LinkedList<Fruit> fruitList, boolean [] usedFruits) {
-	//		double minDist;
-	//		int index = -1;
-	//		for(int i = 1; i < pathSize; i++) {
-	//			minDist = Double.MAX_VALUE;
-	//			for(int j = 0; j < fruitList.size(); j++) {
-	//				if(!usedFruits[j]) {	
-	//					MyCoords dist = new MyCoords();
-	//					double tempDist = dist.distance3d(pointList.get(i), fruitList.get(j).getCoordinates());
-	//					if(minDist > tempDist) {
-	//						minDist = tempDist;
-	//						index = i;
-	//					}			
-	//				}
-	//			}
-	//			pathLength += minDist;
-	//			pointList.add(fruitList.get(index).getCoordinates());
-	//			idList.add(fruitList.get(index).getId());
-	//			usedFruits[index] = true;
-	//		}
-	//	}
-
 }
-
-
-
-//private
-
-//because the id of fruits in csv file can be all number and not start from zero 
-//we must to find this fruit
-//		int index = 0;
-//		Fruit temp = fruitList.get(index);
-//		while(temp.getId() != nextFruitIndex) {
-//			temp = fruitList.get(index);
-//			index++;
-//		}
-
-
-//	coords.add(fruitList.get(index).getCoordinates());
-
-
-//		for(int i = 0; i < length; i++) {
-//			int tempIndexNext= -1;
-//			int tempFruitIdNext = -1;
-//			minDist = Double.MAX_VALUE;
-//			for(int j = 0; j < fruitList.size(); j++) {
-//				//if we don't used this fruit and we check two different fruits
-//				
-//				
-//				if(!idOfUsedFruits[j] && fruitList.get(j).getId() != nextFruitId) {
-//					MyCoords dist = new MyCoords();
-//					double tempDist = dist.distance3d(fruitList.get(index).getCoordinates(), fruitList.get(j).getCoordinates());
-//				
-//					if(minDist > tempDist) {
-//						minDist = tempDist;
-//						tempIndexNext = j;
-//						tempFruitIdNext = fruitList.get(i).getId();
-//					}
-//				}
-//				
-//			}
-
-
-
-
-
-//private
-
-//because the id of fruits in csv file can be all number and not start from zero 
-//we must to find this fruit
-//		int index = 0;
-//		Fruit temp = fruitList.get(index);
-//		while(temp.getId() != nextFruitIndex) {
-//			temp = fruitList.get(index);
-//			index++;
-//		}
-
-
-//	coords.add(fruitList.get(index).getCoordinates());
-
-
-//		for(int i = 0; i < length; i++) {
-//			int tempIndexNext= -1;
-//			int tempFruitIdNext = -1;
-//			minDist = Double.MAX_VALUE;
-//			for(int j = 0; j < fruitList.size(); j++) {
-//				//if we don't used this fruit and we check two different fruits
-//				
-//				
-//				if(!idOfUsedFruits[j] && fruitList.get(j).getId() != nextFruitId) {
-//					MyCoords dist = new MyCoords();
-//					double tempDist = dist.distance3d(fruitList.get(index).getCoordinates(), fruitList.get(j).getCoordinates());
-//				
-//					if(minDist > tempDist) {
-//						minDist = tempDist;
-//						tempIndexNext = j;
-//						tempFruitIdNext = fruitList.get(i).getId();
-//					}
-//				}
-//				
-//			}
-
