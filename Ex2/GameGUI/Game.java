@@ -1,26 +1,19 @@
 package GameGUI;
 
-import java.awt.FileDialog;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
-import javax.swing.JFrame;
-
-import GIS.MetaData;
 import Path2KML.Path2KML;
 
 public class Game {
 
 	private LinkedList<Pacman> pacmanList;
 	private LinkedList<Fruit> fruitList;
-	private LinkedList<Path> pathList;
 
 	public Game() {
 		pacmanList = new LinkedList<>();
@@ -33,10 +26,6 @@ public class Game {
 
 	public LinkedList<Fruit> getFruitList() {
 		return fruitList;
-	}
-
-	public void setPathList(LinkedList<Path> pathList) {
-		this.pathList = pathList;
 	}
 
 	public void readFileDialog(String fileName) {
@@ -125,7 +114,6 @@ public class Game {
 	}
 
 	public void writeFileKML(String fileName, LinkedList<Path> pathList) {
-		setPathList(pathList);
 		new Path2KML(fileName, pathList);
 	}
 }

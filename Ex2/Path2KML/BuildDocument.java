@@ -63,10 +63,10 @@ public class BuildDocument {
 	private void createDocument(Document doc) {
 		//add style of points to DOM 
 		document.appendChild(getStyle(doc, "red", "3", "ff0000ff"));
-		document.appendChild(getStyle(doc, "Yellow", "3", "ff00ffff"));
-		document.appendChild(getStyle(doc, "Green", "3", "ff00ff00"));
+		document.appendChild(getStyle(doc, "yellow", "3", "ff00ffff"));
+		document.appendChild(getStyle(doc, "green", "3", "ff00ff00"));
 		document.appendChild(getStyle(doc, "blue", "3", "ffff0000"));
-		document.appendChild(getStyle(doc, "Purple", "3", "ff800080"));
+		document.appendChild(getStyle(doc, "purple", "3", "ff800080"));
 
 		document.appendChild(getStyleOfObjects(doc, "pacman", addressPacman, "80", "80"));
 		document.appendChild(getStyleOfObjects(doc, "fruit", addressFruit, "80", "80"));

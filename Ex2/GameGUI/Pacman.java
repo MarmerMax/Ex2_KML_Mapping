@@ -21,13 +21,12 @@ public class Pacman {
 	private Point3D point;
 	private double speed;
 	private double radius;
-	private int idCount = 0;
-	//private int nearFruitId;
+
 
 	//private BufferedImage pacmanImage;
 
-	public Pacman(int x, int y) {
-		this.id = idCount++;
+	public Pacman(int x, int y, int id) {
+		this.id = id;
 		double [] xyCoordinate = fromPixelToLatLon(x, y);
 		this.point = new Point3D(xyCoordinate[0], xyCoordinate[1], 0);
 		this.speed = 1;

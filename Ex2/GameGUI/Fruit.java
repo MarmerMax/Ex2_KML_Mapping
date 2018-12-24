@@ -16,19 +16,18 @@ public class Fruit {
 	private Point3D point;
 	private double speed;
 	private BufferedImage fruitImage;
-	
+
 	private int idCount = 0;
-	
 
-	//private BufferedImage fruitImage;
 
-		public Fruit(int x, int y) {
-			this.id = idCount++;
-			double [] xyCoordinate = fromPixelToLatLon(x, y);
-			this.point = new Point3D(xyCoordinate[0], xyCoordinate[1], 0);
-			this.speed = 1;
-			createImage();
-		}
+
+	public Fruit(int x, int y, int id) {
+		this.id = id;
+		double [] xyCoordinate = fromPixelToLatLon(x, y);
+		this.point = new Point3D(xyCoordinate[0], xyCoordinate[1], 0);
+		this.speed = 1;
+		createImage();
+	}
 
 	public Fruit(String [] values) {
 		try {
@@ -59,7 +58,7 @@ public class Fruit {
 	public char getType() {
 		return type;
 	}
-	
+
 	public void createImage() {
 		fruitImage = null;
 		try {
@@ -72,11 +71,11 @@ public class Fruit {
 	public BufferedImage getFruitImage() {
 		return fruitImage;
 	}
-	
+
 	public void removeFruitImage() {
 		fruitImage = null;
 	}
-	
+
 	public double[] fromPixelToLatLon(int x, int y) {
 		double [] xy = new double[2];
 		double xStep = (35.21222222 - 35.20222222) / 1433; 

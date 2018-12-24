@@ -13,52 +13,40 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
-
-import javax.imageio.ImageIO;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
-import com.sun.org.apache.xml.internal.utils.ThreadControllerWrapper;
 
 import Coords.MyCoords;
 import Geom.Point3D;
 
 public class MyFrame extends JFrame implements MouseListener{
 
+
 	public BufferedImage background;
-	private LinkedList<Pacman> pacmanList = null;
-	private LinkedList<Fruit> fruitList = null;
-	//private LinkedList<Path> pathList;
+
+	private LinkedList<Pacman> pacmanList;
+	private LinkedList<Fruit> fruitList;
 	private LinkedList<Path> pathList;
+	private Game game = null;
+
 	private int height, width, startHeight, startWidth;
 	private double heightPercent, widthPercent;
-	private Game game = null;
+
 	private int repaint = 0;
 	private boolean newGame = false;
 	private int x, y;
 
 	private char figure = 'N';
-	private double speed = 1;
 
 
 	public MyFrame() {
@@ -103,11 +91,12 @@ public class MyFrame extends JFrame implements MouseListener{
 
 		//game menu
 		Menu create = new Menu("Create");
-		//MenuItem gameItemStart = new MenuItem("Start");
 		MenuItem createItemPacman = new MenuItem("Pacman");
 		MenuItem createItemFruit = new MenuItem("Fruit");
+		MenuItem createItemPath = new MenuItem("Build Path");
 		create.add(createItemPacman);
 		create.add(createItemFruit);
+		create.add(createItemPath);
 		menuBar.add(create);
 
 		//start menu
@@ -118,10 +107,6 @@ public class MyFrame extends JFrame implements MouseListener{
 		game1.add(gameItemClear);
 		menuBar.add(game1);
 		this.setMenuBar(menuBar);
-
-
-
-
 
 		/////////////////   file menu   //////////////////////
 		fileItemNewGame.addActionListener(new ActionListener() {
@@ -138,7 +123,7 @@ public class MyFrame extends JFrame implements MouseListener{
 				fruitList = game.getFruitList();
 			}
 		});
-		
+
 		fileItemOpen.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -151,12 +136,11 @@ public class MyFrame extends JFrame implements MouseListener{
 				fruitList = game.getFruitList();
 				ShortestPathAlgo pathes = new ShortestPathAlgo(game);
 				pathList = pathes.getPathList();
-				//game.createPath();
+
 				repaint();
-				//ShortestPathAlgo path = new ShortestPathAlgo(game);
 			}
 		});
-		
+
 		fileItemSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -169,7 +153,7 @@ public class MyFrame extends JFrame implements MouseListener{
 				}
 			}
 		});
-		
+
 		fileItemSaveToKml.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -201,6 +185,7 @@ public class MyFrame extends JFrame implements MouseListener{
 				}
 			}
 		});
+
 		createItemFruit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(newGame) {
@@ -212,48 +197,40 @@ public class MyFrame extends JFrame implements MouseListener{
 			}
 		});
 
+		createItemPath.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(newGame) {
+					if(pacmanList.size() > 0 && fruitList.size() > 0) {
+						ShortestPathAlgo pathes = new ShortestPathAlgo(game);
+						pathList = pathes.getPathList();
+
+						repaint();
+					}
+					else {
+						System.out.println("Can't build path. Need at least one pacman and one fruit!");
+					}
+				}
+				else {
+					System.out.println("Can't build path. Need to create new game!");
+				}
+			}
+		});
+
 		/////////////////////game menu//////////////////////////////
 		gameItemStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Thread tmp = new Thread() {
-					@Override
-					public void run() {
-						int index = 0;
-						while(fruitList.size() > 0) {
-							Fruit tempFruit = fruitList.get(index);
-							Pacman tempPacman = pacmanList.get(0);
-							MyCoords pacToFruit = new MyCoords();
-							double dist = pacToFruit.distance3d(tempFruit.getCoordinates(), tempPacman.getCoordinates());
-							double steps = dist / tempPacman.getSpeed();//count steps
-							int countSteps = (int)steps;
-							Point3D pacmanCoordinates = tempPacman.getCoordinates();
-							Point3D fruitCoordinates = tempFruit.getCoordinates();
-							double dX = (fruitCoordinates.x() - pacmanCoordinates.x()) / steps;
-							double dY = (fruitCoordinates.y() - pacmanCoordinates.y()) / steps;
-
-							while(countSteps > 0) {
-								repaint = 2;
-								pacmanList.get(0).getCoordinates().addXYZ(dX, dY, 0);
-								countSteps--;
-								try {
-									sleep(10);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								if(countSteps == 0) {
-									fruitList.get(index).removeFruitImage();
-								}
-								repaint();
-							}
-							index++;
-						}
-					}
-				};
-				tmp.start();
+				ExecutorService pool = Executors.newFixedThreadPool(pathList.size());
+				for(int i = 0; i < pathList.size(); i++) {
+					PacmanRunner temp = new PacmanRunner(i);
+					pool.execute(temp);
+				}
+				
+				pool.shutdown();
 			}
 		});
-		
+
 		gameItemClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -263,9 +240,10 @@ public class MyFrame extends JFrame implements MouseListener{
 		gameItemClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				pathList = new LinkedList<>();
-				fruitList = new LinkedList<>();
-				pacmanList = new LinkedList<>();
+				pathList = null;
+				fruitList = null;
+				pacmanList = null;
+				game = null;
 				repaint();
 			}
 		});
@@ -283,6 +261,16 @@ public class MyFrame extends JFrame implements MouseListener{
 		});	
 	}
 
+	public int getIndexOfThisId(int id) {
+		int index;
+		for(index = 0; index < fruitList.size(); index++) {
+			if(fruitList.get(index).getId() == id) {
+				return index;
+			}
+		}
+		return 0;
+	}
+
 	public void windowResize() {
 		widthPercent = (double)width / startWidth;
 		heightPercent = (double)height / startHeight;
@@ -294,11 +282,9 @@ public class MyFrame extends JFrame implements MouseListener{
 			g.drawImage(background, 0, 50, width, height + 50, this);
 			if(pacmanList != null) {
 				drawPacman(g);
-				//repaint();
 			}
 			if(fruitList != null) {
 				drawFruit(g);
-				//repaint();
 			}
 			if(pathList != null) {
 				drawPath(g);  
@@ -308,18 +294,15 @@ public class MyFrame extends JFrame implements MouseListener{
 			g.drawImage(background, 0, 50, width, height + 50, this);
 			if(pacmanList != null) {
 				drawPacman(g);
-				//repaint();
 			}
 			break;
 		case 2: //repaint pacmans and fruit
 			g.drawImage(background, 0, 50, width, height + 50, this);
 			if(pacmanList != null) {
 				drawPacman(g);
-				//repaint();
 			}
 			if(fruitList != null) {
 				drawFruit(g);
-				//repaint();
 			}
 			break;
 		default:
@@ -338,7 +321,7 @@ public class MyFrame extends JFrame implements MouseListener{
 			int dY = (int)(20.0 * heightPercent);
 			int imgSize = (int)(40.0 * ((widthPercent + heightPercent) / 2));
 			g.drawImage(pacmanList.get(index).getPacmanImage(), xP - dX, 50 + yP - dY, imgSize, imgSize, this);
-			
+
 			index++;
 		}
 	}
@@ -357,6 +340,7 @@ public class MyFrame extends JFrame implements MouseListener{
 			index++;
 		}
 	}
+
 
 	public void drawPath(Graphics g) {
 		//System.out.println(pathList.get(0).getIdList().size());
@@ -402,44 +386,42 @@ public class MyFrame extends JFrame implements MouseListener{
 		String fileName = fd.getFile();
 		return folder + fileName;
 	}		
-	
-    public String writeFileDialog() {
-        //try write to the file
-        FileDialog fd = new FileDialog(this, "Save the text file", FileDialog.SAVE);
-        fd.setFile("*.csv");
-        fd.setFilenameFilter(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".csv");
-            }
-        });
-        fd.setVisible(true);
-        String folder = fd.getDirectory();
-        String fileName = fd.getFile();
+
+	public String writeFileDialog() {
+		//try write to the file
+		FileDialog fd = new FileDialog(this, "Save the text file", FileDialog.SAVE);
+		fd.setFile("*.csv");
+		fd.setFilenameFilter(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".csv");
+			}
+		});
+		fd.setVisible(true);
+		String folder = fd.getDirectory();
+		String fileName = fd.getFile();
 		return folder + fileName;
-    }
-    
-    public String writeFileKML() {
-        //try write to the file
-        FileDialog fd = new FileDialog(this, "Save the kml file", FileDialog.SAVE);
-        fd.setFile("*.kml");
-        fd.setFilenameFilter(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".kml");
-            }
-        });
-        fd.setVisible(true);
-        String folder = fd.getDirectory();
-        String fileName = fd.getFile();
+	}
+
+	public String writeFileKML() {
+		//try write to the file
+		FileDialog fd = new FileDialog(this, "Save the kml file", FileDialog.SAVE);
+		fd.setFile("*.kml");
+		fd.setFilenameFilter(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".kml");
+			}
+		});
+		fd.setVisible(true);
+		String folder = fd.getDirectory();
+		String fileName = fd.getFile();
 		return folder + fileName;
-    }
+	}
 
 	@Override
 	public void mouseClicked(MouseEvent arg) {
 		if(newGame) {
-//			System.out.println("mouse Clicked");
-//			System.out.println("("+ arg.getX() + "," + arg.getY() + "," + figure  + ")");
 			x = arg.getX();
 			y = arg.getY();
 			if(figure == 'N') {
@@ -448,7 +430,7 @@ public class MyFrame extends JFrame implements MouseListener{
 			else if (figure == 'P') {
 				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
 				int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
-				Pacman temp = new Pacman(xP, yP);
+				Pacman temp = new Pacman(xP, yP, pacmanList.size());
 				try {
 					String speedInput = JOptionPane.showInputDialog(null, "Choose speed");
 					temp.setSpeed(Double.parseDouble(speedInput));
@@ -456,15 +438,15 @@ public class MyFrame extends JFrame implements MouseListener{
 					System.err.println("Speed input failed. Wrong type input!");
 				}
 				pacmanList.add(temp);
-				repaint();
 			}
 			else if (figure == 'F'){
 				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
 				int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
-				Fruit temp = new Fruit(xP, yP);
+				Fruit temp = new Fruit(xP, yP, fruitList.size());
 				fruitList.add(temp);
-				repaint();
-			}
+			}			
+
+			repaint();
 		}
 		else {
 			System.out.println("You need to create new game!");
@@ -504,4 +486,55 @@ public class MyFrame extends JFrame implements MouseListener{
 		cc[1] = (int)y;
 		return cc;
 	}
+	
+	class PacmanRunner implements Runnable{
+		
+		private int pathIndex;
+		
+		public PacmanRunner(int index) {
+			this.pathIndex = index;
+		}
+		
+		@Override
+		public void run() {
+			pacmanMooving();
+		}
+		
+		private void pacmanMooving() {
+			int index = 1;
+			while(pathList.get(pathIndex).getPointList().size() > index) {
+
+				Point3D pacmanCoordinates = pathList.get(pathIndex).getPointList().get(0);
+				Point3D fruitCoordinates = pathList.get(pathIndex).getPointList().get(index);
+
+				int indexNextFruit = getIndexOfThisId(pathList.get(pathIndex).getIdList().get(index));
+
+				MyCoords pacToFruit = new MyCoords();
+				double dist = pacToFruit.distance3d(fruitCoordinates, pacmanCoordinates);
+				double steps = dist / pathList.get(pathIndex).getSpeed();//count steps
+				int countSteps = (int)steps;
+
+				double dX = (fruitCoordinates.x() - pacmanCoordinates.x()) / steps;
+				double dY = (fruitCoordinates.y() - pacmanCoordinates.y()) / steps;
+
+				while(countSteps > 0) {
+					repaint = 2;
+					pacmanCoordinates.addXYZ(dX, dY, 0);
+					countSteps--;
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					repaint();
+				}
+				if(countSteps == 0) {
+					fruitList.get(indexNextFruit).removeFruitImage();
+				}
+				index++;
+			}
+		}
+	}
+	
 }
+
