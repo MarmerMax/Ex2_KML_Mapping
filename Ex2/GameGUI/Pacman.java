@@ -1,14 +1,10 @@
 package GameGUI;
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-<<<<<<< HEAD
 
 import Geom.Point3D;
 
@@ -16,13 +12,6 @@ import Geom.Point3D;
  * This class used for initialization pacman by data on map.
  * @author Max Marmer
  *
-=======
-import Geom.Point3D;
-
-/**
- * This class includes all data of pacman that we need to run our project.
- * @author Max Marmer
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
  */
 public class Pacman {
 
@@ -35,7 +24,6 @@ public class Pacman {
 
 
 	/**
-<<<<<<< HEAD
 	 * Constructor function for create pacman by click.
 	 * @param x lat
 	 * @param y lon
@@ -44,29 +32,14 @@ public class Pacman {
 	public Pacman(int x, int y, int id) {
 		this.id = id;
 		double [] xyCoordinate = new Map().fromPixelToLatLon(x, y);
-=======
-	 * This constructor method we use when we create pacman by click on window in new game.
-	 * @param x latitude
-	 * @param y longitude
-	 * @param id id in future csv file
-	 */
-	public Pacman(int x, int y, int id) {
-		this.id = id;
-		double [] xyCoordinate = fromPixelToLatLon(x, y); //call to function that converts from x,y window to lat/long
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 		this.point = new Point3D(xyCoordinate[0], xyCoordinate[1], 0);
 		this.speed = 1;
 		this.radius = 1;
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * Constructor function for create pacman from csv data.
 	 * @param values
-=======
-	 * This constructor method we use when we create game by reading from csv file. 
-	 * @param values array of data from csv file that include all parameters for actual pacman.
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 	 */
 	public Pacman(String [] values) {
 		try {
@@ -83,7 +56,6 @@ public class Pacman {
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * This method create image for pacman and return him.
 	 * @return
 	 */
@@ -97,88 +69,27 @@ public class Pacman {
 		return pacmanImage;
 	}
 	
-=======
-	 * This function convert x, y of window pixels to lat/long degrees.
-	 * @param x count of pixels in X axis
-	 * @param y count of pixels in Y axis
-	 * @return array of lat/long in degrees
-	 */
-	public double[] fromPixelToLatLon(int x, int y) {
-		double [] xy = new double[2];
-		double xStep = (35.212479 - 35.202340) / 1433; 
-		double yStep = (32.105739 - 32.101852) / 642;
-		xy[0] = 32.105739 - (yStep * y);
-		xy[1] = 35.202340 + (xStep * x);
-		return xy;
-	}
-	
-	/**
-	 * Set speed for pacman. We use it when we create pacman by click in new game.
-	 * @param speed speed that user input
-	 */
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 	public void setSpeed(double speed) {
 		this.speed = speed;
 	}
-	
-	/**
-	 * Get id of this pacman.
-	 * @return id
-	 */
+
 	public int getId() {
 		return id;
 	}
 
-	/**
-	 * Get Point3D coordinates of this pacman.
-	 * @return Point3D
-	 */
 	public Point3D getCoordinates() {
 		return point;
 	}
 
-	/**
-	 * Get radius value of this pacman.
-	 * @return radius value
-	 */
 	public double getRadius() {
 		return radius;
 	}
-	
-	/**
-	 * Get speed of this pacman.
-	 * @return speed value
-	 */
+
 	public double getSpeed() {
 		return speed;
 	}
-<<<<<<< HEAD
 	
 	public char getType() {
 		return type;
 	}
-=======
-
-	/**
-	 * Get type of this pacman.
-	 * @return char 'P' 
-	 */
-	public char getType() {
-		return type;
-	}
-
-	/**
-	 * This method read pacman image from computer and return him.
-	 * @return image of pacman
-	 */
-	public BufferedImage getPacmanImage() {
-		BufferedImage pacmanImage = null;
-		try {
-			pacmanImage = ImageIO.read(new File("data\\pacman.png"));
-		} catch (IOException e) {
-			System.err.println("Pacman image create failed!!!");
-		}
-		return pacmanImage;
-	}
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 }

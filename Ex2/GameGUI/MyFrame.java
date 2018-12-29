@@ -44,18 +44,8 @@ public class MyFrame extends JFrame implements MouseListener{
 	private LinkedList<Path> pathList;//list of path
 	private Game game = null;
 
-<<<<<<< HEAD
 	private int height, width, startHeight, startWidth;//sizes
 	private double heightPercent, widthPercent;//size in percent for adaptive changes
-=======
-	private int height, width, startHeight, startWidth;
-	private double heightPercent, widthPercent;
-
-	private ExecutorService pool;
-	private int repaint = 0;
-	private boolean newGame = false;
-	private int x, y;
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 
 	private int repaint = 0;//what need to repaint
 	private boolean newGame = false;//if we create new game
@@ -242,7 +232,6 @@ public class MyFrame extends JFrame implements MouseListener{
 		/////////////////////game menu//////////////////////////////
 		gameItemStart.addActionListener(new ActionListener() {
 			@Override
-<<<<<<< HEAD
 			public void actionPerformed(ActionEvent e) {//start game
 				ExecutorService pool = Executors.newFixedThreadPool(pathList.size());//create thread pool
 				for(int i = 0; i < pathList.size(); i++) {
@@ -251,28 +240,12 @@ public class MyFrame extends JFrame implements MouseListener{
 				}
 				
 				pool.shutdown();
-=======
-			public void actionPerformed(ActionEvent e) {
-				if(pacmanList != null && fruitList != null && pathList != null && pacmanList.size() > 0 && fruitList.size() > 0) {
-					pool = Executors.newFixedThreadPool(pathList.size());
-					for(int i = 0; i < pathList.size(); i++) {
-						PacmanRunner temp = new PacmanRunner(i);
-						pool.execute(temp);
-					}
-					
-					pool.shutdown();
-				}
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 			}
 		});
 
 		gameItemClear.addActionListener(new ActionListener() {
 			@Override
-<<<<<<< HEAD
 			public void actionPerformed(ActionEvent e) {//remove all and repaint
-=======
-			public void actionPerformed(ActionEvent e) {
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 				pathList = null;
 				fruitList = null;
 				pacmanList = null;
@@ -497,37 +470,18 @@ public class MyFrame extends JFrame implements MouseListener{
 			if(figure == 'N') {//we need to choose type of object to create 
 				System.out.println("Please choose type of your figure!");
 			}
-<<<<<<< HEAD
 			else if (figure == 'P') {//create pacman
-//				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
-//				int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
 				int xP = (int)((double)x * (Math.pow(widthPercent, -1))); //change x to actually size
 				int yP = (int)((double)(y - 50) * (Math.pow(heightPercent, -1))); //change y to actually size
 				Pacman temp = new Pacman(xP, yP, pacmanList.size());
 				try {
 					String speedInput = JOptionPane.showInputDialog(null, "Choose speed");//choose speed
 					temp.setSpeed(Double.parseDouble(speedInput));
-=======
-			else if (figure == 'P') {
-				try {
-					String speedInput = JOptionPane.showInputDialog(null, "Choose speed");
-					double tempSpeed = Double.parseDouble(speedInput);
-					if(tempSpeed > 0) {
-						int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
-						int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
-						Pacman temp = new Pacman(xP, yP, pacmanList.size());
-						temp.setSpeed(tempSpeed);
-						pacmanList.add(temp);
-					}
-					else {
-						System.out.println("Wrong speed!");
-					}
->>>>>>> 3d9bf0f5160f10d3344293b4acadb1cf35f1bf30
 				}catch(Exception exp) {
 					//if choose speed failed so speed by default equals to 1
 					System.err.println("Speed input failed. Wrong type input!");
 				}
-				
+				pacmanList.add(temp);
 			}
 			else if (figure == 'F'){//create fruit
 				int xP = (int)((double)x * (Math.pow(widthPercent, -1))); //change x to actually size

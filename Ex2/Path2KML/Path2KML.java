@@ -31,7 +31,6 @@ public class Path2KML {
 	protected DocumentBuilderFactory domFactory= null;
 	protected DocumentBuilder domBuilder = null;
 	private LinkedList<Path> pathList;
-	//private final String[] colors = {"red", "yellow", "green", "blue" ,"purple"};
 
 	/**
 	 * Construction method. This method create KML file from all CSV files which placed in actually
