@@ -1,10 +1,7 @@
 package Path2KML;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -34,7 +31,7 @@ public class Path2KML {
 	protected DocumentBuilderFactory domFactory= null;
 	protected DocumentBuilder domBuilder = null;
 	private LinkedList<Path> pathList;
-	private final String[] colors = {"red", "yellow", "green", "blue" ,"purple"};
+	//private final String[] colors = {"red", "yellow", "green", "blue" ,"purple"};
 
 	/**
 	 * Construction method. This method create KML file from all CSV files which placed in actually
@@ -81,7 +78,7 @@ public class Path2KML {
 			BuildDocument buildDocument = new BuildDocument(newDoc, kmlName);
 			Element document = (Element) buildDocument.getDocument();
 			
-			BuildFolder buildFolder = new BuildFolder(newDoc, pathList, colors);
+			BuildFolder buildFolder = new BuildFolder(newDoc, pathList);
 			Element folder = (Element) buildFolder.getFolder();
 			document.appendChild(folder); //add folder to document
 			
@@ -96,7 +93,7 @@ public class Path2KML {
 			Result result = new StreamResult(new File(kmlName));
 			aTransformer.transform(src, result);
 
-			System.out.println("\nKML path Created Successfully..");
+			System.out.println("KML path Created Successfully..");
 
 		} catch (Exception exp) {
 			System.err.println(exp.toString());

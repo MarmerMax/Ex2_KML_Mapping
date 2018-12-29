@@ -1,0 +1,10 @@
+WigleWifi-1.4,appRelease=2.26,model=Lenovo PB2-690Y,release=6.0.1,device=PB2PRO,display=PB2-690Y_S200032_161214,board=msm8952,brand=Lenovo,,,
+MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type
+1c:b9:c4:15:42:68,Azrieli - SuperPharm,[ESS],2017-12-03 8:53:08,2,-85,32.073645,34.791250,56,5,WIFI
+1c:b9:c4:15:44:58,Azrieli - Kravitz,[ESS],2017-12-03 8:53:08,4,-88,32.073582,34.791947,57,4,WIFI
+1c:b9:c4:15:44:58,Azrieli - BBB,[ESS],2017-12-03 8:53:24,7,-77,32.073818,34.792257,56,2,WIFI
+1c:b9:c4:16:2d:e8,Azrieli - Zara,[ESS],2017-12-03 8:53:24,43,-88,32.074256,34.792659,54,5,WIFI
+1c:b9:c4:15:25:48,Azrieli - Adidas,[ESS],2017-12-03 8:53:27,9,-88,32.074897,34.792503,57,4,WIFI
+1c:b9:c4:16:05:38,Azrieli - Diesel,[ESS],2017-12-03 8:53:33,10,-90,32.075565,34.792272,53,2,WIFI
+1c:b9:c4:15:ed:48,Azrieli - Go Active,[ESS],2017-12-03 8:53:36,34,-89,32.074870,34.791494,54,7,WIFI
+1c:b9:c4:15:44:88,Azrieli - Super Sal,[ESS],2017-12-03 8:53:36,56,-88,32.074220,34.791113,55,1,WIFI

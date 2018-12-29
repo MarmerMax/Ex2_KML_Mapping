@@ -3,12 +3,14 @@ package GameGUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-
 import javax.imageio.ImageIO;
-
 import Geom.Point3D;
 
+/**
+ * This class used for initialization fruit by data on map.
+ * @author Max Marmer
+ *
+ */
 public class Fruit {
 
 	private final char type = 'F';
@@ -17,18 +19,24 @@ public class Fruit {
 	private double speed;
 	private BufferedImage fruitImage;
 
-	private int idCount = 0;
-
-
-
+	/**
+	 * Fruit constructor by click on the map.
+	 * @param x
+	 * @param y
+	 * @param id 
+	 */
 	public Fruit(int x, int y, int id) {
 		this.id = id;
-		double [] xyCoordinate = fromPixelToLatLon(x, y);
+		double [] xyCoordinate = new Map().fromPixelToLatLon(x, y);
 		this.point = new Point3D(xyCoordinate[0], xyCoordinate[1], 0);
 		this.speed = 1;
 		createImage();
 	}
 
+	/**
+	 * Fruit constructor from csv file.
+	 * @param values
+	 */
 	public Fruit(String [] values) {
 		try {
 			id = Integer.parseInt(values[1]);
@@ -58,7 +66,10 @@ public class Fruit {
 	public char getType() {
 		return type;
 	}
-
+	
+	/**
+	 * Method to create image for this fruit.
+	 */
 	public void createImage() {
 		fruitImage = null;
 		try {
@@ -75,14 +86,4 @@ public class Fruit {
 	public void removeFruitImage() {
 		fruitImage = null;
 	}
-
-	public double[] fromPixelToLatLon(int x, int y) {
-		double [] xy = new double[2];
-		double xStep = (35.21222222 - 35.20222222) / 1433; 
-		double yStep = (32.10555556 - 32.10194444) / 642;
-		xy[0] = 32.10555556 - (yStep * y);
-		xy[1] = 35.20222222 + (xStep * x);
-		return xy;
-	}
-
 }

@@ -83,18 +83,6 @@ public class BuildDocument {
 		return style;
 	}
 	
-//	private Node getStyleOfObjects(Document doc, String id, String path, String width, String height) {
-//	Element style = doc.createElement("Style");
-//	style.setAttribute("id", id);
-//	Element img = doc.createElement("img");
-//	img.setAttribute("src", path);
-//	img.setAttribute("width", width);
-//	img.setAttribute("height", height);
-//	style.appendChild(img);
-//
-//	return style;
-//}
-	
 	private Node getIcon(Document doc, String path, String width, String height) {
 		Element node = doc.createElement("Icon");
 		node.appendChild(getPathIcon(doc, path));

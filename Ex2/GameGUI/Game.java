@@ -10,11 +10,19 @@ import java.util.StringTokenizer;
 
 import Path2KML.Path2KML;
 
+/**
+ * Class for create Pacman game.
+ * @author Max Marmer
+ *
+ */
 public class Game {
 
 	private LinkedList<Pacman> pacmanList;
 	private LinkedList<Fruit> fruitList;
 
+	/**
+	 * Class constructor
+	 */
 	public Game() {
 		pacmanList = new LinkedList<>();
 		fruitList = new LinkedList<>();
@@ -28,6 +36,10 @@ public class Game {
 		return fruitList;
 	}
 
+	/**
+	 * Method for read data from csv file.
+	 * @param fileName
+	 */
 	public void readFileDialog(String fileName) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
@@ -56,6 +68,10 @@ public class Game {
 		}
 	}
 
+	/**
+	 * Method for write data to csv file.
+	 * @param fileName
+	 */
 	public void writeFileDialog(String fileName) {
 		try {
 			FileWriter fw = new FileWriter(fileName);
@@ -113,6 +129,11 @@ public class Game {
 		System.out.println("Save file done!");
 	}
 
+	/**
+	 * Method for create kml file.
+	 * @param fileName
+	 * @param pathList
+	 */
 	public void writeFileKML(String fileName, LinkedList<Path> pathList) {
 		new Path2KML(fileName, pathList);
 	}

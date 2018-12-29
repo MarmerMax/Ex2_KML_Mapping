@@ -1,15 +1,8 @@
 package Path2KML;
 
-import org.w3c.dom.*;
 
-import GIS.GISElement;
-import GIS.GISLayer;
-import GIS.GISProject;
 import GameGUI.Path;
 import Geom.Point3D;
-import sun.security.tools.PathList;
-
-import java.sql.Timestamp;
 import java.util.LinkedList;
 
 import org.w3c.dom.Document;
@@ -25,18 +18,15 @@ import org.w3c.dom.Node;
 public class BuildFolder {
 
 	private Element folder = null;
-	private GISLayer layer = null;
 	private LinkedList<Path> pathList;
-	private String [] colors;
 
 	/**
 	 * Construction method. Create folder and add all points.
 	 * @param doc name of general document that include this folder.
 	 * @param csvName name of CSV file
 	 */
-	public BuildFolder(Document doc, LinkedList<Path> pathList, String [] style) {
+	public BuildFolder(Document doc, LinkedList<Path> pathList) {
 		this.pathList = pathList;
-		this.colors = style;
 		//create folder and give name to this folder
 		createFolder(doc); 
 
@@ -96,6 +86,14 @@ public class BuildFolder {
 		}
 	}
 	
+	/**
+	 * Create placemark for point on the map.
+	 * @param doc
+	 * @param temp
+	 * @param time
+	 * @param type
+	 * @return place mark node
+	 */
 	private Node createObjects(Document doc, Point3D temp, String time, String type) {
 		Element placemark = doc.createElement("Placemark");
 		
@@ -114,12 +112,22 @@ public class BuildFolder {
 		return placemark;
 	}
 	
+	/**
+	 * This method create node with time stamp.
+	 * @param doc
+	 * @param time
+	 * @return timestamp node
+	 */
 	public Node getTimeStamp(Document doc, String time) {
 		Node node = doc.createElement("when");
 		node.appendChild(doc.createTextNode(time));
 		return node;
 	}
 	
+	/**
+	 * This method create node with coordinates for point node.
+	 * @return coordinates for point
+	 */
 	public Node getPointCoordinates(Document doc, Point3D point) {
 		Node node = doc.createElement("coordinates");
 		String x = "" + point.y();
@@ -131,7 +139,7 @@ public class BuildFolder {
 	
 
 	/**
-	 * This method get element from layer and need to turn him to node.
+	 * This method create node line from data and return placemark if line.
 	 * @param doc name of general document
 	 * @param element GIS element that we need to explore
 	 * @return new node
@@ -150,6 +158,12 @@ public class BuildFolder {
 		return placemark;
 	}
 
+	/**
+	 * This method return node with coordinates for create line.
+	 * @param doc
+	 * @param temp
+	 * @return coordinates node
+	 */
 	private Node getCoordinates(Document doc, Path temp) {
 		Element node = doc.createElement("coordinates");
 		for(int i = 0; i < temp.getPointList().size(); i++) {

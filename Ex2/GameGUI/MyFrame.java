@@ -29,26 +29,33 @@ import javax.swing.JOptionPane;
 import Coords.MyCoords;
 import Geom.Point3D;
 
+/**
+ * This class need for GUI initialization. This class include resize function that change size of 
+ * window adaptive for user. 
+ * @author Max Marmer
+ *
+ */
 public class MyFrame extends JFrame implements MouseListener{
 
+	public BufferedImage background;//background image
 
-	public BufferedImage background;
-
-	private LinkedList<Pacman> pacmanList;
-	private LinkedList<Fruit> fruitList;
-	private LinkedList<Path> pathList;
+	private LinkedList<Pacman> pacmanList;//list of pacman
+	private LinkedList<Fruit> fruitList;//list of fruit
+	private LinkedList<Path> pathList;//list of path
 	private Game game = null;
 
-	private int height, width, startHeight, startWidth;
-	private double heightPercent, widthPercent;
+	private int height, width, startHeight, startWidth;//sizes
+	private double heightPercent, widthPercent;//size in percent for adaptive changes
 
-	private int repaint = 0;
-	private boolean newGame = false;
-	private int x, y;
+	private int repaint = 0;//what need to repaint
+	private boolean newGame = false;//if we create new game
+	private int x, y;//x, y by click
 
-	private char figure = 'N';
+	private char figure = 'N';//which figure to create
 
-
+	/**
+	 * Construction function of class
+	 */
 	public MyFrame() {
 		try {
 			createGUI();
@@ -59,14 +66,19 @@ public class MyFrame extends JFrame implements MouseListener{
 		this.addMouseListener(this);
 	}
 
+	/**
+	 * In this class we create menu bar with buttons and give them event by click.
+	 * @throws IOException
+	 */
 	private void createGUI() throws IOException {
 
-		background = new Map().getMap();
-		heightPercent = widthPercent = 1;
+		background = new Map().getMap();//create background
+		heightPercent = widthPercent = 1;//start percent 100%
 		startHeight = background.getHeight();
 		startWidth = background.getWidth();
 		height = startHeight;
 		width = startWidth;
+		
 
 
 		setVisible(true);
@@ -112,7 +124,7 @@ public class MyFrame extends JFrame implements MouseListener{
 		fileItemNewGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				pacmanList = null;
+				pacmanList = null; //remove all exists lists
 				fruitList = null;
 				pathList = null;
 				repaint(); //repaint before after remove all objects
@@ -129,12 +141,12 @@ public class MyFrame extends JFrame implements MouseListener{
 			public void actionPerformed(ActionEvent e) {
 				repaint = 0;
 				newGame = false;
-				String fileName = readFileDialog();
+				String fileName = readFileDialog();//read file name
 				game = new Game();
-				game.readFileDialog(fileName);
+				game.readFileDialog(fileName);//create new game from file
 				pacmanList = game.getPacmanList();
 				fruitList = game.getFruitList();
-				ShortestPathAlgo pathes = new ShortestPathAlgo(game);
+				ShortestPathAlgo pathes = new ShortestPathAlgo(game);//create paths
 				pathList = pathes.getPathList();
 
 				repaint();
@@ -143,10 +155,10 @@ public class MyFrame extends JFrame implements MouseListener{
 
 		fileItemSave.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {//save to csv
 				if(game != null) {
 					String fileName = writeFileDialog();
-					game.writeFileDialog(fileName);
+					game.writeFileDialog(fileName);//create file csv with name
 				}
 				else {
 					System.out.println("Can't save empty game!");
@@ -156,7 +168,7 @@ public class MyFrame extends JFrame implements MouseListener{
 
 		fileItemSaveToKml.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {//save paths to kml
 				if(game != null) {
 					String fileName = writeFileKML();
 					game.writeFileKML(fileName, pathList);
@@ -169,7 +181,7 @@ public class MyFrame extends JFrame implements MouseListener{
 
 		fileItemExit.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent evt) {
+			public void actionPerformed(ActionEvent evt) {//close project
 				System.exit(0);
 			}
 		});
@@ -177,7 +189,7 @@ public class MyFrame extends JFrame implements MouseListener{
 		////////////////   create menu   //////////////////////
 		createItemPacman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(newGame) {
+				if(newGame) {//if we create new game we can choose create pacman
 					figure = 'P';
 				}
 				else {
@@ -188,7 +200,7 @@ public class MyFrame extends JFrame implements MouseListener{
 
 		createItemFruit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(newGame) {
+				if(newGame) {//if we create new game we can choose create fruit
 					figure = 'F';
 				}
 				else {
@@ -200,9 +212,9 @@ public class MyFrame extends JFrame implements MouseListener{
 		createItemPath.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(newGame) {
-					if(pacmanList.size() > 0 && fruitList.size() > 0) {
-						ShortestPathAlgo pathes = new ShortestPathAlgo(game);
+				if(newGame) {//if we have new game so we can continue
+					if(pacmanList.size() > 0 && fruitList.size() > 0) {//if them not null so we can check path
+						ShortestPathAlgo pathes = new ShortestPathAlgo(game);//create paths
 						pathList = pathes.getPathList();
 
 						repaint();
@@ -220,11 +232,11 @@ public class MyFrame extends JFrame implements MouseListener{
 		/////////////////////game menu//////////////////////////////
 		gameItemStart.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				ExecutorService pool = Executors.newFixedThreadPool(pathList.size());
+			public void actionPerformed(ActionEvent e) {//start game
+				ExecutorService pool = Executors.newFixedThreadPool(pathList.size());//create thread pool
 				for(int i = 0; i < pathList.size(); i++) {
-					PacmanRunner temp = new PacmanRunner(i);
-					pool.execute(temp);
+					PacmanRunner temp = new PacmanRunner(i);//for every pacman we create thread
+					pool.execute(temp);//add thread to executor
 				}
 				
 				pool.shutdown();
@@ -233,13 +245,7 @@ public class MyFrame extends JFrame implements MouseListener{
 
 		gameItemClear.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-
-		gameItemClear.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {//remove all and repaint
 				pathList = null;
 				fruitList = null;
 				pacmanList = null;
@@ -251,16 +257,29 @@ public class MyFrame extends JFrame implements MouseListener{
 
 		//////////////////////////window frame///////////////////////
 		getContentPane().addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
+			public void componentResized(ComponentEvent e) {//window listener
 				Component c = (Component)e.getComponent();
 				width = c.getWidth();
 				height = c.getHeight();
-				windowResize();
+				windowResize();//resize all by actual situation
 				repaint();
 			}
 		});	
 	}
 
+	/**
+	 * Check the width and height in percent
+	 */
+	public void windowResize() {
+		widthPercent = (double)(width * 1.0 / (startWidth * 1.0));
+		heightPercent = (double)(height * 1.0 / (startHeight * 1.0));
+	}
+
+	/**
+	 * This function search index of needed id in idList
+	 * @param id id to search
+	 * @return index of this id
+	 */
 	public int getIndexOfThisId(int id) {
 		int index;
 		for(index = 0; index < fruitList.size(); index++) {
@@ -271,13 +290,11 @@ public class MyFrame extends JFrame implements MouseListener{
 		return 0;
 	}
 
-	public void windowResize() {
-		widthPercent = (double)width / startWidth;
-		heightPercent = (double)height / startHeight;
-	}
-
+	/**
+	 * Paint all objects on GUI window 
+	 */
 	public void paint(Graphics g){
-		switch(repaint){
+		switch(repaint){ // we have other type of paint
 		case 0: //repaint all
 			g.drawImage(background, 0, 50, width, height + 50, this);
 			if(pacmanList != null) {
@@ -309,12 +326,16 @@ public class MyFrame extends JFrame implements MouseListener{
 			break;
 		}
 	}
-
+	
+	/**
+	 * Draw pacman in GUI window
+	 * @param g
+	 */
 	public void drawPacman(Graphics g) {
 		int index = 0;
-		while(index < pacmanList.size()) {
+		while(index < pacmanList.size()) {//run on list of pacman and draw every one
 			Pacman temp = pacmanList.get(index);
-			int [] coor = getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
+			int [] coor = fromLatLonToPixel(temp.getCoordinates().x(), temp.getCoordinates().y());
 			int xP = (int)((double)coor[0] * widthPercent);
 			int yP = (int)((double)coor[1] * heightPercent);
 			int dX = (int)(20.0 * widthPercent);
@@ -326,11 +347,15 @@ public class MyFrame extends JFrame implements MouseListener{
 		}
 	}
 
+	/**
+	 * Draw fruit in GUI window
+	 * @param g
+	 */
 	public void drawFruit(Graphics g) {
 		int index = 0;
 		while(index < fruitList.size()) {
 			Fruit temp = fruitList.get(index);
-			int [] coor = getXYfromLatLon(temp.getCoordinates().x(), temp.getCoordinates().y());
+			int [] coor = fromLatLonToPixel(temp.getCoordinates().x(), temp.getCoordinates().y());
 			int xP = (int)((double)coor[0] * widthPercent);
 			int yP = (int)((double)coor[1] * heightPercent);
 			int dX = (int)(15.0 * widthPercent);
@@ -342,18 +367,22 @@ public class MyFrame extends JFrame implements MouseListener{
 	}
 
 
+	/**
+	 * Draw path in GUI window
+	 * @param g
+	 */
 	public void drawPath(Graphics g) {
-		//System.out.println(pathList.get(0).getIdList().size());
 		for(int i = 0; i < pathList.size(); i++) {
 			for(int j = 0; j < pathList.get(i).getPathSize() - 1; j++) {
+				
 				Point3D temp = pathList.get(i).getPointList().get(j);
 				Point3D temp2 = pathList.get(i).getPointList().get(j + 1);
 				double x1 = temp.x();
 				double y1 = temp.y();
 				double x2 = temp2.x();
 				double y2 = temp2.y();
-				int [] coor1 = getXYfromLatLon(x1, y1);
-				int [] coor2 = getXYfromLatLon(x2, y2);
+				int [] coor1 = fromLatLonToPixel(x1, y1);
+				int [] coor2 = fromLatLonToPixel(x2, y2);
 
 				int xP1 = (int)((double)coor1[0] * widthPercent);
 				int yP1 = (int)((double)coor1[1] * heightPercent);
@@ -369,7 +398,10 @@ public class MyFrame extends JFrame implements MouseListener{
 		}
 	}
 
-
+	/**
+	 * Open window for choose file
+	 * @return file name to open
+	 */
 	public String readFileDialog() {
 		//try read from the file
 		FileDialog fd = new FileDialog(this, "Open text file", FileDialog.LOAD);
@@ -387,6 +419,10 @@ public class MyFrame extends JFrame implements MouseListener{
 		return folder + fileName;
 	}		
 
+	/**
+	 * Open window to choose path of save file and choose name
+	 * @return
+	 */
 	public String writeFileDialog() {
 		//try write to the file
 		FileDialog fd = new FileDialog(this, "Save the text file", FileDialog.SAVE);
@@ -403,6 +439,10 @@ public class MyFrame extends JFrame implements MouseListener{
 		return folder + fileName;
 	}
 
+	/**
+	 * Open window to choose name of KML file
+	 * @return
+	 */
 	public String writeFileKML() {
 		//try write to the file
 		FileDialog fd = new FileDialog(this, "Save the kml file", FileDialog.SAVE);
@@ -419,29 +459,35 @@ public class MyFrame extends JFrame implements MouseListener{
 		return folder + fileName;
 	}
 
+	/**
+	 * Create object by mouse click
+	 */
 	@Override
 	public void mouseClicked(MouseEvent arg) {
 		if(newGame) {
 			x = arg.getX();
 			y = arg.getY();
-			if(figure == 'N') {
+			if(figure == 'N') {//we need to choose type of object to create 
 				System.out.println("Please choose type of your figure!");
 			}
-			else if (figure == 'P') {
-				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
-				int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
+			else if (figure == 'P') {//create pacman
+//				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
+//				int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
+				int xP = (int)((double)x * (Math.pow(widthPercent, -1))); //change x to actually size
+				int yP = (int)((double)(y - 50) * (Math.pow(heightPercent, -1))); //change y to actually size
 				Pacman temp = new Pacman(xP, yP, pacmanList.size());
 				try {
-					String speedInput = JOptionPane.showInputDialog(null, "Choose speed");
+					String speedInput = JOptionPane.showInputDialog(null, "Choose speed");//choose speed
 					temp.setSpeed(Double.parseDouble(speedInput));
 				}catch(Exception exp) {
+					//if choose speed failed so speed by default equals to 1
 					System.err.println("Speed input failed. Wrong type input!");
 				}
 				pacmanList.add(temp);
 			}
-			else if (figure == 'F'){
-				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
-				int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
+			else if (figure == 'F'){//create fruit
+				int xP = (int)((double)x * (Math.pow(widthPercent, -1))); //change x to actually size
+				int yP = (int)((double)(y - 50) * (Math.pow(heightPercent, -1))); //change y to actually size
 				Fruit temp = new Fruit(xP, yP, fruitList.size());
 				fruitList.add(temp);
 			}			
@@ -466,8 +512,14 @@ public class MyFrame extends JFrame implements MouseListener{
 	//35.20222222	35.21222222 
 	//32.10555556	32.10194444
 
-	public int[] getXYfromLatLon(double latitude, double longitude) {
-		double mapHeight = 622;
+	/**
+	 * From latitude and longitude to pixels
+	 * @param latitude
+	 * @param longitude
+	 * @return
+	 */
+	public int[] fromLatLonToPixel(double latitude, double longitude) {
+		double mapHeight = 642;
 		double mapWidth = 1433;
 		double mapLatBottom = 32.10194444;
 		double mapLngLeft = 35.20222222;
@@ -487,9 +539,15 @@ public class MyFrame extends JFrame implements MouseListener{
 		return cc;
 	}
 	
+	/**
+	 * This class of Pacman Thread that implements runnable. Find length between pacman to next 
+	 * point and makes need's step.
+	 * @author Max Marmer
+	 *
+	 */
 	class PacmanRunner implements Runnable{
 		
-		private int pathIndex;
+		private int pathIndex;//index of path
 		
 		public PacmanRunner(int index) {
 			this.pathIndex = index;
@@ -506,7 +564,8 @@ public class MyFrame extends JFrame implements MouseListener{
 
 				Point3D pacmanCoordinates = pathList.get(pathIndex).getPointList().get(0);
 				Point3D fruitCoordinates = pathList.get(pathIndex).getPointList().get(index);
-
+				
+				//save index of next fruit
 				int indexNextFruit = getIndexOfThisId(pathList.get(pathIndex).getIdList().get(index));
 
 				MyCoords pacToFruit = new MyCoords();
@@ -529,12 +588,11 @@ public class MyFrame extends JFrame implements MouseListener{
 					repaint();
 				}
 				if(countSteps == 0) {
-					fruitList.get(indexNextFruit).removeFruitImage();
+					fruitList.get(indexNextFruit).removeFruitImage();//remove image from GUI
 				}
 				index++;
 			}
 		}
 	}
-	
 }
 

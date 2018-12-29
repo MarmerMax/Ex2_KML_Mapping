@@ -6,10 +6,18 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+/**
+ * Class for create map.
+ * @author Max Marmer
+ *
+ */
 public class Map {
 	
 	private BufferedImage map;
 	
+	/**
+	 * Class constructor.
+	 */
 	public Map() {
 		try {
 			map = ImageIO.read(new File("data\\Ariel1.png"));
@@ -18,12 +26,22 @@ public class Map {
 		}
 	}
 	
+	/**
+	 * Get image.
+	 * @return
+	 */
 	public BufferedImage getMap() {
 		return map;
 	}
 	
-	public int[] ll2xy(double lat, double lon) {
-		double mapHeight = 622;
+	/**
+	 * This method convert from lat, lon to pixel x,y for this map.
+	 * @param lat
+	 * @param lon
+	 * @return array of x, y in pixel
+	 */
+	public int[] fromLatLonToPixel(double lat, double lon) {
+		double mapHeight = 642;
 		double mapWidth = 1433;
 		double mapLatBottom = 32.10194444;
 		double mapLngLeft = 35.20222222;
@@ -37,10 +55,25 @@ public class Map {
 		double x = (lon - mapLngLeft) * (mapWidth / mapLngDelta);
 		double y = mapHeight - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) 
 								/ (1 - Math.sin(latitudeRad)))) - mapOffsetY);
-		int [] coor = new int[2];
-		coor[0] = (int)x;
-		coor[1] = (int)y;
-		return coor;
+		int [] pixelXY = new int[2];
+		pixelXY[0] = (int)x;
+		pixelXY[1] = (int)y;
+		return pixelXY;
+	}
+	
+	/**
+	 * This method convert from x,y in pixel to lat, lon in degrees for this map.
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public double[] fromPixelToLatLon(int x, int y) {
+		double [] degreesLatlon = new double[2];
+		double xStep = (35.212479 - 35.202340) / 1433; 
+		double yStep = (32.105739 - 32.101852) / 642;
+		degreesLatlon[0] = 32.105739 - (yStep * y);
+		degreesLatlon[1] = 35.202340 + (xStep * x);
+		return degreesLatlon;
 	}
 
 }
