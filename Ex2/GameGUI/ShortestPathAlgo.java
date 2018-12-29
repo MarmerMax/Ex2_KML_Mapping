@@ -1,67 +1,14 @@
-//package GameGUI;
-//
-//import java.util.LinkedList;
-//
-//import Geom.Point3D;
-//
-//public class ShortestPathAlgo {
-//
-//	private LinkedList<Pacman> pacmanList;
-//	private LinkedList<Fruit> fruitList;
-//	private LinkedList<LinkedList<Point3D>> pathList;
-//	private boolean[] usedFruits; //flag to already used fruits
-//
-//	public ShortestPathAlgo(Game game) {
-//		this.pacmanList = game.getPacmanList();
-//		this.fruitList = game.getFruitList();
-//		findPath();
-//	}
-//
-//	private void findPath() {
-//		if(pacmanList.size() != 0 && fruitList.size() != 0) {
-//			//int pathLength = fruitList.size() / pacmanList.size();
-//			pathList = new LinkedList<>();
-//			//usedFruits = new boolean[fruitList.size()];
-//
-////			for(int i = 0; i < pacmanList.size(); i++) {
-////				Path tempPath = new Path(pacmanList.get(i), fruitList, pathLength, usedFruits);
-////				pathList.add(tempPath);
-////			}
-//			
-//			for(int i = 0; i < pacmanList.size(); i++) {
-//				LinkedList<Point3D> tempPath = new LinkedList<>();
-//				tempPath.add(pacmanList.get(i).getCoordinates());
-//				for(int j = 0; j < fruitList.size(); j++) {
-//					double x = fruitList.get(j).getCoordinates().x();
-//					double y = fruitList.get(j).getCoordinates().y();
-//					double z = fruitList.get(j).getCoordinates().z();
-//					Point3D temp = new Point3D(x, y, z);
-//					tempPath.add(temp);
-//				}
-//				pathList.add(tempPath);
-//			}
-//		}
-//	}
-//	public LinkedList<LinkedList<Point3D>> getPathList(){
-//		return pathList;
-//	}
-//}
-//	private double distance(Fruit f, Pacman p) {
-//		int [] fruitCoords = new Map().ll2xy(f.getCoordinates().x(), f.getCoordinates().y());
-//		int [] pacmanCoords = new Map().ll2xy(p.getCoordinates().x(), p.getCoordinates().y());
-//		double dx = fruitCoords[0] - pacmanCoords[0];
-//		double dy = fruitCoords[1] - pacmanCoords[1];
-//		double res = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-//		return res;
-//	}
 
 package GameGUI;
 
 import java.util.LinkedList;
-
 import Coords.MyCoords;
 import Geom.Point3D;
 
+/**
+ * This class find all paths in project.
+ * @author Maksim
+ */
 public class ShortestPathAlgo {
 
 	private LinkedList<Pacman> pacmanList;
@@ -69,50 +16,65 @@ public class ShortestPathAlgo {
 	private LinkedList<Path> pathList;
 	private LinkedList<Integer> usedFruits;
 
+	/**
+	 * This constructor function receive game and search best paths. 
+	 * @param game
+	 */
 	public ShortestPathAlgo(Game game) {
 		this.pacmanList = game.getPacmanList();
 		this.fruitList = game.getFruitList();
 		findPath();
 	}
-
+	
+	/**
+	 * This function creates list of paths.
+	 */
 	private void findPath() {
-		if(pacmanList.size() != 0 && fruitList.size() != 0) {
+		
+		if(pacmanList.size() != 0 && fruitList.size() != 0) {//if we have least at one object of each type
 			pathList = new LinkedList<>();
 			usedFruits = new LinkedList<>();
-			int pathSize = (fruitList.size() / pacmanList.size()) + 1;
+			int pathSize = (fruitList.size() / pacmanList.size()) + 1; //count path size 
 
-			for(int i = 0; i < pacmanList.size(); i++) {
+			for(int i = 0; i < pacmanList.size(); i++) { //create path for all pacman
 				pathList.add(new Path(pacmanList.get(i)));
 			}
 
-			for(int i = 0; i < pathSize; i++) {
+			for(int i = 0; i < pathSize; i++) { //start to build paths
 
-				for(int j = 0; j < pacmanList.size(); j++) {
+				for(int j = 0; j < pacmanList.size(); j++) { //choose next path 
 					double minDist = Double.MAX_VALUE;
 					int nextFruit = -1;
 
-					for(int k = 0; k < fruitList.size(); k++) {
-						if(isNewFruit(k)) {
+					for(int k = 0; k < fruitList.size(); k++) { //find next point in path
+						
+						if(isNewFruit(k)) { //if this index has not been used
+							
 							Point3D p1 = pathList.get(j).getPointList().get(i);
 							Point3D p2 = fruitList.get(k).getCoordinates();
 
 							double tempDist = new MyCoords().distance3d(p1, p2);
 
-							if(minDist > tempDist) {
+							if(minDist > tempDist) { //if this distance less that previous so it's minimum
 								minDist = tempDist;
 								nextFruit = k;
 							}	
 						}
 					}
 					if(nextFruit != -1) {
-						pathList.get(j).add(fruitList.get(nextFruit));
-						usedFruits.add(nextFruit);
+						pathList.get(j).add(fruitList.get(nextFruit)); //add fruit to path
+						usedFruits.add(nextFruit); //add index of this fruit to list of "used fruits"
 					}
 				}
 			}
 		}
 	}
-
+	
+	/**
+	 *This function check if this index still has not been used in any path. 
+	 * @param k index to check
+	 * @return true if index has not been used, false used
+	 */
 	private boolean isNewFruit(int k) {
 		int i = 0;
 		while(i < usedFruits.size()) {
@@ -124,6 +86,10 @@ public class ShortestPathAlgo {
 		return true;
 	}
 
+	/**
+	 * Get path list of all paths.
+	 * @return all paths
+	 */
 	public LinkedList<Path> getPathList(){
 		return pathList;
 	}

@@ -42,6 +42,7 @@ public class MyFrame extends JFrame implements MouseListener{
 	private int height, width, startHeight, startWidth;
 	private double heightPercent, widthPercent;
 
+	private ExecutorService pool;
 	private int repaint = 0;
 	private boolean newGame = false;
 	private int x, y;
@@ -221,19 +222,15 @@ public class MyFrame extends JFrame implements MouseListener{
 		gameItemStart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ExecutorService pool = Executors.newFixedThreadPool(pathList.size());
-				for(int i = 0; i < pathList.size(); i++) {
-					PacmanRunner temp = new PacmanRunner(i);
-					pool.execute(temp);
+				if(pacmanList != null && fruitList != null && pathList != null && pacmanList.size() > 0 && fruitList.size() > 0) {
+					pool = Executors.newFixedThreadPool(pathList.size());
+					for(int i = 0; i < pathList.size(); i++) {
+						PacmanRunner temp = new PacmanRunner(i);
+						pool.execute(temp);
+					}
+					
+					pool.shutdown();
 				}
-				
-				pool.shutdown();
-			}
-		});
-
-		gameItemClear.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
 			}
 		});
 
@@ -343,7 +340,6 @@ public class MyFrame extends JFrame implements MouseListener{
 
 
 	public void drawPath(Graphics g) {
-		//System.out.println(pathList.get(0).getIdList().size());
 		for(int i = 0; i < pathList.size(); i++) {
 			for(int j = 0; j < pathList.get(i).getPathSize() - 1; j++) {
 				Point3D temp = pathList.get(i).getPointList().get(j);
@@ -428,16 +424,23 @@ public class MyFrame extends JFrame implements MouseListener{
 				System.out.println("Please choose type of your figure!");
 			}
 			else if (figure == 'P') {
-				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
-				int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
-				Pacman temp = new Pacman(xP, yP, pacmanList.size());
 				try {
 					String speedInput = JOptionPane.showInputDialog(null, "Choose speed");
-					temp.setSpeed(Double.parseDouble(speedInput));
+					double tempSpeed = Double.parseDouble(speedInput);
+					if(tempSpeed > 0) {
+						int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
+						int yP = (int)((double)(y - 50) * ((1 + (1 - heightPercent)))); //change y to actually size
+						Pacman temp = new Pacman(xP, yP, pacmanList.size());
+						temp.setSpeed(tempSpeed);
+						pacmanList.add(temp);
+					}
+					else {
+						System.out.println("Wrong speed!");
+					}
 				}catch(Exception exp) {
 					System.err.println("Speed input failed. Wrong type input!");
 				}
-				pacmanList.add(temp);
+				
 			}
 			else if (figure == 'F'){
 				int xP = (int)((double)x * ((1 + (1 - widthPercent)))); //change x to actually size
